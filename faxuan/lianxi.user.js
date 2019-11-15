@@ -27,14 +27,12 @@
   setTimeout(function() {
     // console.log("monkey");
     // console.log(trs);
-
-    sps.myCommit();
-
     setTimeout(function() {
+      setTimeout(closeCurrentPage, 3000);
       var trs = $("div#popwinContent a#popwinConfirm");
       trs.click();
-      setTimeout(closeCurrentPage, 2000);
-    }, 1000);
+    }, 3000);
+    sps.myCommit();
 
     // doAllClassListen(arrNeed);
   }, 4000);
