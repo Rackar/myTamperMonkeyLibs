@@ -10,8 +10,23 @@
 
 (function() {
   "use strict";
+  function closeCurrentPage() {
+    var userAgent = navigator.userAgent;
+    if (
+      userAgent.indexOf("Firefox") != -1 ||
+      userAgent.indexOf("Chrome") != -1
+    ) {
+      window.location.href = "about:blank";
+      window.close();
+    } else {
+      window.opener = null;
+      window.open("", "_self");
+      window.close();
+    }
+  }
   setTimeout(function() {
     CKobject.getObjectById(playerId).videoPlay();
+    setTimeout(closeCurrentPage, 60 * 60 * 1000);
   }, 2000);
   //   CKobject.getObjectById(playerId).videoPlay();
   // Your code here...
