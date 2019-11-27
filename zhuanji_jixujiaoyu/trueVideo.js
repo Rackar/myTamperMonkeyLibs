@@ -26,6 +26,10 @@
   }
   setTimeout(function() {
     CKobject.getObjectById(playerId).videoPlay();
+    setTimeout(() => {
+      CKobject.getObjectById(playerId).addListener("pause", closeCurrentPage);
+    }, 5000);
+
     setTimeout(closeCurrentPage, 60 * 60 * 1000);
   }, 2000);
   //   CKobject.getObjectById(playerId).videoPlay();
