@@ -11,7 +11,7 @@
 (function() {
   "use strict";
   setTimeout(() => {
-    btnok();
+    // btnok();
     // $("#loginbtn").click();
   }, 1000);
 
