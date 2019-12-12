@@ -18,10 +18,7 @@
 
   function closeCurrentPage() {
     var userAgent = navigator.userAgent;
-    if (
-      userAgent.indexOf("Firefox") != -1 ||
-      userAgent.indexOf("Chrome") != -1
-    ) {
+    if (userAgent.indexOf("Firefox") != -1 || userAgent.indexOf("Chrome") != -1) {
       window.location.href = "about:blank";
       window.close();
     } else {
@@ -30,18 +27,15 @@
       window.close();
     }
   }
-function closePage(){
-      player.videoMute()
-    let data=  player.getMetaDate()
-    let toal = data.duration
-      console.log('init')
-      setTimeout(closeCurrentPage, toal* 1000);
+  function closePage() {
+    player.videoMute();
+    let data = player.getMetaDate();
+    let toal = data.duration + 120;
+    console.log("init");
+    setTimeout(closeCurrentPage, toal * 1000);
   }
 
-     setTimeout(()=>{
-         closePage()
-
-
-     }, 4 * 1000);
-
+  setTimeout(() => {
+    closePage();
+  }, 4 * 1000);
 })();
