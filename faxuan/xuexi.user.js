@@ -8,21 +8,28 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
   "use strict";
 
-  setTimeout(function() {
+  setTimeout(function () {
     var trs = $("div.kclx ul#lx-box-id a");
-    trs[0].click();
+    if (trs.length) {
+      //如果有练习，就直接点两次完成练习。
+      trs[0].click();
+      setTimeout(function () {
+        trs[0].click();
+      }, 15000);
+    }
+
     console.log(trs);
 
-    setTimeout(function() {
+    setTimeout(function () {
       sps.exitStudy("timer");
 
-      setTimeout(function() {
-        var trs = $("div#popwinContent a#popwinConfirm");
-        trs.click();
-      }, 1000);
+      setTimeout(function () {
+        var tds = $("div#popwinContent a#popwinConfirm");
+        tds.click();
+      }, 2000);
     }, 10 * 60 * 1000 + 10000);
   }, 4000);
   // Your code here...

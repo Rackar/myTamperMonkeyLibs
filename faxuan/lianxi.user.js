@@ -8,7 +8,7 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
   "use strict";
   function closeCurrentPage() {
     var userAgent = navigator.userAgent;
@@ -24,13 +24,13 @@
       window.close();
     }
   }
-  setTimeout(function() {
+  setTimeout(function () {
     // console.log("monkey");
     // console.log(trs);
-    setTimeout(function() {
+    setTimeout(function () {
       setTimeout(closeCurrentPage, 3000);
       var trs = $("div#popwinContent a#popwinConfirm");
-      trs.click();
+      if (trs && trs.click) trs.click();
     }, 3000);
     sps.myCommit();
 
