@@ -37,7 +37,7 @@
   setTimeout(function() {
     $(".classtab .menu a").attr("target", "_blank");
 
-    var trs = $(".classtab .menu li");
+    var trs = $(".course-h.oh ul li");
     // console.log("monkey");
     console.log(trs);
     let arrNeed = [];

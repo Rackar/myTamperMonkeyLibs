@@ -4,7 +4,7 @@
 // @version      0.4
 // @description  try to take over the world!
 // @author       rackar
-// @match        https://web.chinahrt.com/course/play_video?*
+// @match        https://web.chinahrt.com/index.html#/v_video?*
 // @grant        none
 // ==/UserScript==
 
@@ -29,6 +29,6 @@
     }, 2000);
 
     // window.location.href = src;
-  }, 2000);
+  }, 4000);
   // Your code here...
 })();
