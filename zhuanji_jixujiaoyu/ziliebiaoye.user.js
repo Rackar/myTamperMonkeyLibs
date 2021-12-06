@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         专业技术继续教育_列表页
+// @name         专业技术继续教育_子列表页
 // @namespace    https://rackar.github.io/article_tech/zhuCeCHS_edu.html
 // @version      0.4
 // @description  try to take over the world!
 // @author       rackar
-// @match        https://web.chinahrt.com/index.html#/v_selected_course?*
+// @match        https://web.chinahrt.com/index.html*
 // @grant        none
 // ==/UserScript==
 
@@ -34,8 +34,9 @@
     return secend;
   }
 
-  setTimeout(function() {
-    $(".classtab .menu a").attr("target", "_blank");
+  if (location.hash.indexOf("v_courseDetails") > -1) {
+     setTimeout(function() {
+    // $(".course-h.oh ul li a").attr("target", "_blank");
 
     var trs = $(".course-h.oh ul li");
     // console.log("monkey");
@@ -45,8 +46,8 @@
       const tr = trs[index];
       const aMark = tr.children[1];
       //   console.log(tr.children[4].innerText);
-      if (tr.children[0].innerText.substring(0, 3) != "已学完") {
-        let time = gotTime(aMark.innerText);
+      if (aMark.innerText.substring(0, 3) != "已学完") {
+        let time = gotTime(tr.children[0].innerText);
         // aMark.attr("target", "_blank");
         let button = aMark;
         let obj = {
@@ -62,4 +63,8 @@
 
     doAllClassListen(arrNeed);
   }, 4000);
+  }
+
+
+ 
 })();

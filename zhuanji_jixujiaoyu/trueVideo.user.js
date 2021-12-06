@@ -8,7 +8,7 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
   "use strict";
   function closeCurrentPage() {
     var userAgent = navigator.userAgent;
@@ -24,14 +24,22 @@
       window.close();
     }
   }
-  setTimeout(function() {
-    CKobject.getObjectById(playerId).videoPlay();
+  setTimeout(function () {
+    // CKobject.getObjectById(playerId).videoPlay();
+    document.getElementById("video").click();
+    window.player.videoMute()
+
     setTimeout(() => {
-      CKobject.getObjectById(playerId).addListener("pause", closeCurrentPage);
+      window.player.videoPlay()
+
+    }, 1000);
+    setTimeout(() => {
+      // CKobject.getObjectById(playerId).addListener("pause", closeCurrentPage);
+      window.player.addListener("pause", closeCurrentPage)
     }, 5000);
 
     setTimeout(closeCurrentPage, 60 * 60 * 1000);
-  }, 2000);
+  }, 5000);
   //   CKobject.getObjectById(playerId).videoPlay();
   // Your code here...
 })();

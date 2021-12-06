@@ -4,7 +4,7 @@
 // @version      0.4
 // @description  try to take over the world!
 // @author       rackar
-// @match        https://web.chinahrt.com/index.html#/v_video?*
+// @match        https://web.chinahrt.com/index.html*
 // @grant        none
 // ==/UserScript==
 
@@ -14,8 +14,8 @@
   // $(".video-container.cb").append(
   //   `<a src="${src}" id="newlinktoVideo">新插入链接</a>`
   // );
-
-  setTimeout(function() {
+  if (location.hash.indexOf("v_video") > -1) {
+    setTimeout(function() {
     let myiframe = $("#iframe");
     let src = myiframe[0].src.replace("ifPauseBlur=1", "ifPauseBlur=0");
     console.log(src);
@@ -30,5 +30,8 @@
 
     // window.location.href = src;
   }, 4000);
+  }
+
+  
   // Your code here...
 })();
