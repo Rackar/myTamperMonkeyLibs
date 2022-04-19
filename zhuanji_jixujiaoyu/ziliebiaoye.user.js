@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         专业技术继续教育_子列表页
+// @name         专业技术继续教育_子列表页2022
 // @namespace    https://rackar.github.io/article_tech/zhuCeCHS_edu.html
-// @version      0.4
+// @version      0.5
 // @description  try to take over the world!
 // @author       rackar
 // @match        https://web.chinahrt.com/index.html*
@@ -66,5 +66,4 @@
   }
 
 
- 
 })();
