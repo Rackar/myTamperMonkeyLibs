@@ -44,18 +44,22 @@
     // $(".course-list.cb ul li a").attr("target", "_blank");
 
     // var trs = $(".course-list.cb ul li"); //2021以前的
-    let  trs  = $(".course-list.cb ul li span.bg");
+    let buttonDom  = $(".course-list.cb ul li span.bg");
     let timeDom = $(".course-list ul li .page-view span.tipColor")
-    // console.log("monkey");
-    console.log(trs);
+    let processDom=$(".course-list ul li div.progress-line span")
+    // console.log(buttonDom);
     let arrNeed = [];
-    for (let index = 0; index < trs.length; index++) {
-      const button = trs[index];
-      const aMark= timeDom[index]
+    for (let index = 0; index < buttonDom.length; index++) {
+      const button = buttonDom[index];
+      const studyTime= timeDom[index]
+      let curProcess = processDom[index].innerText
+      if(curProcess =="100%"){
+        continue;
+      }
       // const aMark = tr.children[1];
       //   console.log(tr.children[4].innerText);
-      if (aMark.innerText.substring(0, 3) == "学时：") {
-        let time = gotTime(aMark.innerText.slice(3));
+      if (studyTime.innerText.substring(0, 3) == "学时：") {
+        let time = gotTime(studyTime.innerText.slice(3));
         // aMark.attr("target", "_blank");
         let obj = {
           time,
