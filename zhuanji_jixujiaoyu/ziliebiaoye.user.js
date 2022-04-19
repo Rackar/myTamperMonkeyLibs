@@ -23,6 +23,12 @@
       console.log("点击按钮第" + i);
       await sleepTime(obj[i].time);
     }
+    await sleepTime(60);
+    //返回主列表页 刷新激活
+    let backBtns = $(".details-main .crumbs-title p a")
+    backBtns[0].click()
+    await sleepTime(5);
+    location.reload();
   }
   function gotTime(text) {
     let right = text.split("(")[1];
@@ -34,7 +40,7 @@
     return secend;
   }
 
-  if (location.hash.indexOf("v_courseDetails") > -1) {
+  if (location.hash.indexOf("v_courseDetails") > -1 && (new Date()).getFullYear()===2022) {
      setTimeout(function() {
     // $(".course-h.oh ul li a").attr("target", "_blank");
 

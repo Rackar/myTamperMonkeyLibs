@@ -39,7 +39,7 @@
     return secend;
   }
 
-  if (location.hash.indexOf("v_selected_course") > -1) {
+  if (location.hash.indexOf("v_selected_course") > -1 && (new Date()).getFullYear()===2022) {
      setTimeout(function() {
     // $(".course-list.cb ul li a").attr("target", "_blank");
 
