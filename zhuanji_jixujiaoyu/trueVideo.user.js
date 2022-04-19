@@ -11,7 +11,8 @@
 (function () {
   "use strict";
   function closeCurrentPage() {
-    var userAgent = navigator.userAgent;
+    setTimeout(() => {
+      var userAgent = navigator.userAgent;
     if (
       userAgent.indexOf("Firefox") != -1 ||
       userAgent.indexOf("Chrome") != -1
@@ -23,6 +24,8 @@
       window.open("", "_self");
       window.close();
     }
+    }, 8000);
+    
   }
   setTimeout(function () {
     // CKobject.getObjectById(playerId).videoPlay();
