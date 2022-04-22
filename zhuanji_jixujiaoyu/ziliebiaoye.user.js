@@ -20,7 +20,7 @@
   async function doAllClassListen(obj) {
     for (let i = 0; i < obj.length; i++) {
       obj[i].button.click();
-      console.log("点击按钮第" + i);
+      console.log("点击按钮第" + i+", 预计等待时长为:"+obj[i].time);
       await sleepTime(obj[i].time);
     }
     await sleepTime(60);
@@ -33,10 +33,9 @@
   function gotTime(text) {
     let right = text.split("(")[1];
     let left = right.split(")")[0];
-    console.log(left);
     let timearr = left.split(":");
-    let secend = timearr[0] * 60 * 60 + timearr[1] * 60 + timearr[2] * 1 + 30;
-    console.log(secend);
+    let secend = timearr[0] * 60 * 60 + timearr[1] * 60 + timearr[2] * 1 ;
+    // console.log(`${left}换算为${secend}秒`);
     return secend;
   }
 
@@ -54,15 +53,14 @@
       //   console.log(tr.children[4].innerText);
       if (aMark.innerText.substring(0, 3) != "已学完") {
         let time = gotTime(tr.children[0].innerText);
+        let doneTime = gotTime(aMark.innerText)
         // aMark.attr("target", "_blank");
         let button = aMark;
         let obj = {
-          time,
+          time : time - doneTime + 80,
           button
         };
         arrNeed.push(obj);
-        // button.click()
-        // return;
       }
     }
     console.log(arrNeed);
