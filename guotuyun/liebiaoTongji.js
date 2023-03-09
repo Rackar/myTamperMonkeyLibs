@@ -5,6 +5,8 @@
 // @description  try to take over the world!
 // @author       rackar
 // @match        https://landcloud.org.cn/*
+// @match        https://jg.landcloud.org.cn:9443/*
+// @match https://jg.landcloud.org.cn:5443/*
 // @require      https://cdn.bootcss.com/jquery/2.2.1/jquery.js
 // @grant        none
 // ==/UserScript==
@@ -45,42 +47,76 @@
     new Date().getFullYear() === 2023
   ) {
     setTimeout(function () {
-      addInput();
-      // $(".course-list.cb ul li a").attr("target", "_blank");
-
-      // var trs = $(".course-list.cb ul li"); //2021以前的
-
-      // for (let index = 0; index < trs.length; index++) {
-      //   const button = buttonDom[index];
-      //   const studyTime = timeDom[index];
-      //   let curProcess = processDom[index].innerText;
-      //   if (curProcess == "100%") {
-      //     continue;
-      //   }
-      //   // const aMark = tr.children[1];
-      //   //   console.log(tr.children[4].innerText);
-      //   if (studyTime.innerText.substring(0, 3) == "学时：") {
-      //     let time = gotTime(studyTime.innerText.slice(3));
-      //     // aMark.attr("target", "_blank");
-      //     let obj = {
-      //       time,
-      //       button,
-      //     };
-      //     arrNeed.push(obj);
-      //     // button.click()
-      //     // return;
-      //   }
-      // }
+      //addInput();
     }, 1000);
+  } else if (location.href.indexOf("jg.landcloud.org.cn:9443") > -1) {
+    // iframe内
+  } else if (location.href.indexOf("jg.landcloud.org.cn:5443") > -1) {
+    // iframe内
+    console.log("进入iframe内部5443");
+    setTimeout(function () {
+      addInput();
+    }, 5000);
   }
-  function onclickHandle() {
-    console.log("点击按钮");
-    let trs = $("#activeIframe table.el-table__body");
-    // let trs = $("table", document.frames("activeIframe").document);
-    // activeIframe;
-    // let trs = $("table.el-table__body tbody tr.el-table__row");
-    console.log(trs);
+
+  async function getList() {
+    console.log("进入getlist");
+    let trs = $(
+      ".el-table__fixed-body-wrapper table button.el-button--success"
+    );
+    // console.log(trs);
+
+    let btn = trs[0];
+    btn.click();
+    await sleepTime(2);
+    let continues = true;
+    let recoreds = [];
+    while (continues) {
+      let result = await getShenhe();
+      if (result) {
+        recoreds.push(result);
+      }
+      continues = await goNext();
+    }
+    console.log(JSON.stringify(recoreds));
   }
+  async function getShenhe() {
+    let tab = $("#tab-6");
+    tab.click();
+
+    await sleepTime(1);
+    let divs = $(".el-timeline-item__wrapper");
+    // console.log(divs);
+    let shengjieguo = null;
+    for (let i = 0; i < divs.length; i++) {
+      const wrap = divs[i];
+      if (wrap.children[0].innerText === "省级审核") {
+        let person = wrap.children[1].children[0].children[0].innerText;
+        let result = wrap.children[1].children[1].innerText;
+
+        shengjieguo = { person, result };
+      }
+    }
+    // console.log(shengjieguo);
+    return shengjieguo;
+  }
+
+  async function goNext() {
+    let nextBtn = $(
+      ".pro-detail .pro-detail-head button.el-button.el-button--primary.el-button--mini"
+    );
+    // console.log("获取下一条btn", nextBtn);
+    for (const btn of nextBtn) {
+      if (btn.innerText === "下一条 ") {
+        btn.click();
+        await sleepTime(2);
+        return true;
+      }
+    }
+
+    return false;
+  }
+  function onclickHandle() {}
 
   function addInput() {
     //使用DOM的创建元素方法
@@ -91,7 +127,7 @@
     o.value = "开始按钮";
     o.style = "position: absolute;top: 20px;left: 40%;z-index: 9999;";
 
-    o.addEventListener("click", onclickHandle);
+    o.addEventListener("click", getList);
 
     document.body.appendChild(o);
 
