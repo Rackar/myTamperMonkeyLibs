@@ -5,15 +5,16 @@
 // @description  try to take over the world!
 // @author       rackar
 // @match        https://web.chinahrt.com/index.html*
+// @match        https://gp.chinahrt.com/index.html*
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
   "use strict";
 
   // Your code here...
   function sleepTime(secends) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => resolve(), secends * 1000);
     });
   }
@@ -34,47 +35,48 @@
     // console.log(left);
     // let timearr = left.split(":");
     // let secend = timearr[0] * 60 * 60 + timearr[1] * 60 + timearr[2] * 1 + 30;
-    let secend=text*60*60
+    let secend = text * 60 * 60;
     console.log(secend);
     return secend;
   }
 
-  if (location.hash.indexOf("v_selected_course") > -1 && (new Date()).getFullYear()===2022) {
-     setTimeout(function() {
-    // $(".course-list.cb ul li a").attr("target", "_blank");
+  if (
+    location.hash.indexOf("v_selected_course") > -1 &&
+    new Date().getFullYear() === 2023
+  ) {
+    setTimeout(function () {
+      // $(".course-list.cb ul li a").attr("target", "_blank");
 
-    // var trs = $(".course-list.cb ul li"); //2021以前的
-    let buttonDom  = $(".course-list.cb ul li span.bg");
-    let timeDom = $(".course-list ul li .page-view span.tipColor")
-    let processDom=$(".course-list ul li div.progress-line span")
-    // console.log(buttonDom);
-    let arrNeed = [];
-    for (let index = 0; index < buttonDom.length; index++) {
-      const button = buttonDom[index];
-      const studyTime= timeDom[index]
-      let curProcess = processDom[index].innerText
-      if(curProcess =="100%"){
-        continue;
+      // var trs = $(".course-list.cb ul li"); //2021以前的
+      let buttonDom = $(".course-list.cb ul li span.bg");
+      let timeDom = $(".course-list ul li .page-view span.tipColor");
+      let processDom = $(".course-list ul li div.progress-line span");
+      // console.log(buttonDom);
+      let arrNeed = [];
+      for (let index = 0; index < buttonDom.length; index++) {
+        const button = buttonDom[index];
+        const studyTime = timeDom[index];
+        let curProcess = processDom[index].innerText;
+        if (curProcess == "100%") {
+          continue;
+        }
+        // const aMark = tr.children[1];
+        //   console.log(tr.children[4].innerText);
+        if (studyTime.innerText.substring(0, 3) == "学时：") {
+          let time = gotTime(studyTime.innerText.slice(3));
+          // aMark.attr("target", "_blank");
+          let obj = {
+            time,
+            button,
+          };
+          arrNeed.push(obj);
+          // button.click()
+          // return;
+        }
       }
-      // const aMark = tr.children[1];
-      //   console.log(tr.children[4].innerText);
-      if (studyTime.innerText.substring(0, 3) == "学时：") {
-        let time = gotTime(studyTime.innerText.slice(3));
-        // aMark.attr("target", "_blank");
-        let obj = {
-          time,
-          button
-        };
-        arrNeed.push(obj);
-        // button.click()
-        // return;
-      }
-    }
-    console.log(arrNeed);
+      console.log(arrNeed);
 
-    doAllClassListen(arrNeed);
-  }, 4000);
+      doAllClassListen(arrNeed);
+    }, 4000);
   }
 })();
-
-
