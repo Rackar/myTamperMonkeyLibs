@@ -13,32 +13,30 @@
   function closeCurrentPage() {
     setTimeout(() => {
       var userAgent = navigator.userAgent;
-    if (
-      userAgent.indexOf("Firefox") != -1 ||
-      userAgent.indexOf("Chrome") != -1
-    ) {
-      window.location.href = "about:blank";
-      window.close();
-    } else {
-      window.opener = null;
-      window.open("", "_self");
-      window.close();
-    }
+      if (
+        userAgent.indexOf("Firefox") != -1 ||
+        userAgent.indexOf("Chrome") != -1
+      ) {
+        window.location.href = "about:blank";
+        window.close();
+      } else {
+        window.opener = null;
+        window.open("", "_self");
+        window.close();
+      }
     }, 8000);
-    
   }
   setTimeout(function () {
     // CKobject.getObjectById(playerId).videoPlay();
     document.getElementById("video").click();
-    window.player.videoMute()
+    window.player.videoMute();
 
     setTimeout(() => {
-      window.player.videoPlay()
-
+      window.player.videoPlay();
     }, 1000);
     setTimeout(() => {
       // CKobject.getObjectById(playerId).addListener("pause", closeCurrentPage);
-      window.player.addListener("pause", closeCurrentPage)
+      window.player.addListener("pause", closeCurrentPage);
     }, 5000);
 
     setTimeout(closeCurrentPage, 60 * 60 * 1000);

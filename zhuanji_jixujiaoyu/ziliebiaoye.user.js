@@ -61,7 +61,7 @@
           // aMark.attr("target", "_blank");
           let button = aMark;
           let obj = {
-            time:(time - doneTime)*1.2 + 20,//长时间有偏移
+            time: (time - doneTime) * 1.2 + 20, //长时间有偏移
             button,
           };
           arrNeed.push(obj);

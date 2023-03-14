@@ -8,30 +8,29 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
+(function () {
   "use strict";
 
   // $(".video-container.cb").append(
   //   `<a src="${src}" id="newlinktoVideo">新插入链接</a>`
   // );
   if (location.hash.indexOf("v_video") > -1) {
-    setTimeout(function() {
-    let myiframe = $("#iframe");
-    let src = myiframe[0].src.replace("ifPauseBlur=1", "ifPauseBlur=0");
-    console.log(src);
-    $("body").append(
-      '<a href="' + src + '" id="newlinktoVideo">这是添加的A标签</a>'
-    );
-    setTimeout(function() {
-      let btn = $("#newlinktoVideo");
-      console.log(btn);
-      btn[0].click();
-    }, 2000);
+    setTimeout(function () {
+      let myiframe = $("#iframe");
+      let src = myiframe[0].src.replace("ifPauseBlur=1", "ifPauseBlur=0");
+      console.log(src);
+      $("body").append(
+        '<a href="' + src + '" id="newlinktoVideo">这是添加的A标签</a>'
+      );
+      setTimeout(function () {
+        let btn = $("#newlinktoVideo");
+        console.log(btn);
+        btn[0].click();
+      }, 2000);
 
-    // window.location.href = src;
-  }, 4000);
+      // window.location.href = src;
+    }, 4000);
   }
-
 
   // Your code here...
 })();
