@@ -26,10 +26,10 @@
         let btn = $("#newlinktoVideo");
         console.log(btn);
         btn[0].click();
-      }, 2000);
+      }, 500);
 
       // window.location.href = src;
-    }, 4000);
+    }, 3000);
   }
 
   // Your code here...
