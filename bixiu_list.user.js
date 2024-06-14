@@ -5,6 +5,7 @@
 // @description  try to take over the world!
 // @author       rackar
 // @match        http://rsedu.ch.mnr.gov.cn//index/onlineCourseUser/class?*
+// @match        https://rsedu.ch.mnr.gov.cn//index/onlineCourseUser/class?*
 // @grant        none
 // ==/UserScript==
 

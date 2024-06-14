@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         专业技术继续教育_列表页2022
+// @name         专业技术继续教育_列表页2024
 // @namespace    https://rackar.github.io/article_tech/zhuCeCHS_edu.html
 // @version      0.5
 // @description  try to take over the world!
@@ -14,7 +14,7 @@
 
   if (
     location.hash.indexOf("v_selected_course") > -1 &&
-    new Date().getFullYear() === 2023
+    new Date().getFullYear() === 2024
   ) {
     setTimeout(function () {
       // $(".course-list.cb ul li a").attr("target", "_blank");
@@ -40,7 +40,7 @@ async function doAllClassListen(obj) {
     console.log("点击按钮第" + i);
     await sleepTime(5);
     console.log("等待5秒");
-    location.reload();
+   // location.reload(); //这里为啥要刷新页面？忘记了，暂时屏蔽掉
     console.log("刷新页面");
     await sleepTime(obj[i].time);
   }
