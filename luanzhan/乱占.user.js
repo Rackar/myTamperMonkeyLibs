@@ -29,6 +29,17 @@
   }
 
   function addUI() {
+    var css =
+      "button.hoverbtn:hover{ background-color: #b3cbff }button.passbtn{background-color:#edffed}button.refusebtn{background-color:#e8806b}";
+    var style = document.createElement("style");
+
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+
+    document.getElementsByTagName("head")[0].appendChild(style);
     // 创建一个包装div
     var containerDiv = document.createElement("div");
     containerDiv.style.position = "absolute";
@@ -93,13 +104,79 @@
     // startButton.addEventListener("click", readTextareaContent);
     // #endregion
 
+    var passContainer = document.createElement("div"); // 创建一个容器来存放所有的选择框
+    passContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
+    passContainer.style.flexWrap = "wrap"; // 允许换行
+    passContainer.style.justifyContent = "center"; // 水平居中
+    passContainer.style.paddingTop = "20px";
+    passContainer.id = "myPassPanel";
+    containerDiv.appendChild(passContainer); // 将容器添加到页面中
+
+    var optionsPass = [
+      { text: "2013年以前建设", value: "2013年以前建设" },
+      { text: "未占用耕地", value: "未占用耕地" },
+      { text: "已取得合法手续", value: "已取得合法手续" },
+      { text: "有手续（无套合）", value: "有手续" },
+      { text: "不属于房屋", value: "不属于房屋" },
+      { text: "已拆除", value: "已拆除" },
+      { text: "房屋属于住宅", value: "房屋属于住宅" },
+    ];
+    // 用于存储当前选中的值
+    var selectedValue = "";
+    // 动态创建多个复选框
+    optionsPass.forEach(function (optionText, index) {
+      var radioButton = document.createElement("input");
+      radioButton.type = "radio"; // 设置类型为单选框
+      radioButton.name = "radioPass"; // 一个组唯一ID
+      radioButton.value = optionText.value;
+      radioButton.id = "checkbox" + (index + 1);
+
+      radioButton.addEventListener("change", function () {
+        selectedValue = this;
+        console.log("当前选中:", selectedValue.value);
+        // 在这里处理单选按钮变化后的逻辑
+      });
+      var div = document.createElement("div");
+
+      var label = document.createElement("label");
+      label.htmlFor = radioButton.id;
+      label.appendChild(document.createTextNode(optionText.text));
+
+      div.appendChild(radioButton);
+      div.appendChild(label);
+
+      passContainer.appendChild(div);
+    });
+
     // 创建单次通过按钮
     var singleButton = document.createElement("button");
     singleButton.id = "singleButton";
     singleButton.innerHTML = "√ 单次通过（需先进入查看详情页）";
     singleButton.style.marginTop = "10px";
-    containerDiv.appendChild(singleButton);
+    singleButton.style.cursor = "pointer";
+    //  singleButton.style.backgroundColor = "#edffed";
+    singleButton.classList.add("hoverbtn");
+    singleButton.classList.add("passbtn");
+    passContainer.appendChild(singleButton);
     singleButton.addEventListener("click", clickSaveBtn);
+
+    // // 创建有手续通过按钮
+    // var singleShouxuButton = document.createElement("button");
+    // singleShouxuButton.id = "singleShouxuButton";
+    // singleShouxuButton.innerHTML = "√ 有手续通过（无套合）";
+    // singleShouxuButton.style.marginTop = "10px";
+    // singleShouxuButton.style.cursor = "pointer";
+    // singleShouxuButton.addEventListener("click", clickShouxuPassBtn);
+    // passContainer.appendChild(singleShouxuButton);
+
+    // // 创建住宅类通过按钮
+    // var singleZhuzhaiButton = document.createElement("button");
+    // singleZhuzhaiButton.id = "singleZhuzhaiButton";
+    // singleZhuzhaiButton.innerHTML = "√ 住宅类通过";
+    // singleZhuzhaiButton.style.marginTop = "10px";
+    // singleZhuzhaiButton.style.cursor = "pointer";
+    // singleZhuzhaiButton.addEventListener("click", clickZhuzhaiPassBtn);
+    // passContainer.appendChild(singleZhuzhaiButton);
 
     // 创建多选框组
     var options = [
@@ -142,7 +219,12 @@
     var singleRefuseButton = document.createElement("button");
     singleRefuseButton.id = "singleRefuseButton";
     singleRefuseButton.innerHTML = "× 单次不通过（需多选理由）";
+    singleRefuseButton.style.cursor = "pointer";
     singleRefuseButton.style.marginTop = "10px";
+    // singleRefuseButton.style.backgroundColor = "#e8806b";
+    //  singleRefuseButton.style.hover = "background-color: #ff0000";
+    singleRefuseButton.classList.add("hoverbtn");
+    singleRefuseButton.classList.add("refusebtn");
     container.appendChild(singleRefuseButton);
     singleRefuseButton.addEventListener("click", clickRefuseBtn);
 
@@ -151,8 +233,10 @@
     singleClearButton.id = "singleClearButton";
     singleClearButton.innerHTML = "清除对勾";
     singleClearButton.title = "每次需手动清空所有对勾选择";
+    singleClearButton.style.cursor = "pointer";
     singleClearButton.style.marginTop = "5px";
     singleClearButton.style.marginLeft = "10px";
+
     container.appendChild(singleClearButton);
     singleClearButton.addEventListener("click", uncheckAllBox);
 
@@ -189,6 +273,22 @@
         document.onmousemove = null;
       }
     }
+  }
+  function getSelectedRadioValue() {
+    var radios = document.getElementsByName("radioPass");
+    for (var i = 0; i < radios.length; i++) {
+      if (radios[i].checked) {
+        return radios[i].value; // 返回选中项的值
+      }
+    }
+    return null; // 如果没有选中任何项，则返回null
+  }
+  function clearRadioSelection() {
+    var radios = document.getElementsByName("radioPass");
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].checked = false;
+    }
+    console.log("所有单选按钮的值已清空");
   }
 
   // 初始化
@@ -231,12 +331,17 @@
       if (panelShow && panelShow.hidden == true) {
         return alert("请先进入详情页面查看举证情况");
       }
+
+      let radioPass = getSelectedRadioValue();
+      if (!radioPass) {
+        return alert("请先进选择通过类型");
+      }
       // inputElement.value = id; // 填充ID
       // 模拟点击按钮
       inputElement.click();
 
       await sleepSec(1000);
-      console.log("");
+
       let radios = document.querySelectorAll("input.ant-radio-input");
       let radio;
       for (let i = 0; i < radios.length; i++) {
@@ -264,26 +369,33 @@
             'nz-option-item[title="审核通过"].ant-select-item-option-active.ant-select-item-option'
           );
           option.click();
-          await sleepSec(200);
-          let saveBtn = document.querySelector(
-            ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
-          );
-          saveBtn.click();
+          clearRadioSelection();
+          // await sleepSec(200);
+          // let saveBtn = document.querySelector(
+          //   ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
+          // );
+          // saveBtn.click();
 
-          await sleepSec(600);
-          let closeBtn = document.querySelector(
-            ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
-          );
-          closeBtn.click();
-          await sleepSec(600);
-          let nextBtn = document.querySelector(
-            ".ant-table-tbody td.ant-table-cell-fix-right-first a"
-          );
-          nextBtn.click();
+          // await sleepSec(600);
+          // let closeBtn = document.querySelector(
+          //   ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+          // );
+          // closeBtn.click();
+          // await sleepSec(600);
+          // let nextBtn = document.querySelector(
+          //   ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+          // );
+          // nextBtn.click();
         }
       }
+    } else {
+      return alert("请先进入详情页面查看举证情况");
     }
   }
+
+  function clickShouxuPassBtn(params) {}
+
+  function clickZhuzhaiPassBtn(params) {}
 
   async function clickRefuseBtn() {
     var selectedTexts = readCheckboxValues();
@@ -343,6 +455,8 @@
           // );
           // nextBtn.click();
         }
+      } else {
+        return alert("请先进入详情页面查看举证情况");
       }
     } else {
       alert("请至少选择一个理由");
