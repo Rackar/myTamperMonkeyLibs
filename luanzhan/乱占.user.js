@@ -46,26 +46,29 @@
     containerDiv.style.top = "10px";
     document.body.appendChild(containerDiv);
 
-    // 创建可拖动的textarea元素
-    var textarea = document.createElement("textarea");
-    textarea.id = "customTextarea";
-    textarea.style.width = "300px";
-    textarea.style.height = "100px";
-    // textarea.style.resize = "both"; // 允许调整大小
-    containerDiv.appendChild(textarea);
-
     // 使整个div可拖动
     makeElementDraggable(containerDiv);
 
-    // 创建开始执行按钮
-    var startButton = document.createElement("button");
-    startButton.id = "executeButton";
-    startButton.innerHTML = "开始批量执行（开发中）";
-    startButton.style.marginTop = "10px";
-    containerDiv.appendChild(startButton);
+    //#region 创建可拖动的textarea元素
 
-    // 绑定按钮点击事件
-    startButton.addEventListener("click", readTextareaContent);
+    // // 创建可拖动的textarea元素
+    // var textarea = document.createElement("textarea");
+    // textarea.id = "customTextarea";
+    // textarea.style.width = "300px";
+    // textarea.style.height = "100px";
+    // // textarea.style.resize = "both"; // 允许调整大小
+    // containerDiv.appendChild(textarea);
+
+    // // 创建开始执行按钮
+    // var startButton = document.createElement("button");
+    // startButton.id = "executeButton";
+    // startButton.innerHTML = "开始批量执行（开发中）";
+    // startButton.style.marginTop = "10px";
+    // containerDiv.appendChild(startButton);
+
+    // // 绑定按钮点击事件
+    // startButton.addEventListener("click", readTextareaContent);
+    // #endregion
 
     // 创建单次通过按钮
     var singleButton = document.createElement("button");
@@ -74,6 +77,60 @@
     singleButton.style.marginTop = "10px";
     containerDiv.appendChild(singleButton);
     singleButton.addEventListener("click", clickSaveBtn);
+
+    // 创建多选框组
+    var options = [
+      "现有手续无法证明",
+      "现场照片无法证明",
+      "补充批复的图斑位置套合图，或补充2012年套合影像",
+      "无手续证明",
+      "补充有效用地手续",
+      "现有材料无法证明，补充2012年套合影像",
+      "补充土地证图斑位置套合图",
+      "图斑范围有房子，填报为住宅类",
+      "提供2024年套合影像",
+      "补充土地证的图斑位置套合图",
+      "房屋非2013年前建设，补充有效用地手续，或填报为住宅类",
+      "补充有效用地手续及图斑位置套合图",
+      "部分房屋非2013年前建设，补充有效用地手续，或填报为住宅类",
+      "提供用地审批手续",
+      "提供12年前（含12年）卫星影像套合图",
+      "拍摄图斑范围房屋近距离正面照片",
+      "图斑内有房屋未拍摄",
+      "卫星影像套合图红框位置不是下发的图斑位置",
+    ];
+    var container = document.createElement("div"); // 创建一个容器来存放所有的选择框
+    container.style.display = "block"; // 改变布局方式以便更好地排列复选框
+    container.style.flexWrap = "wrap"; // 允许换行
+    container.style.justifyContent = "center"; // 水平居中
+    container.style.paddingTop = "20px";
+    container.id = "myCheckbox";
+
+    // 动态创建多个复选框
+    options.forEach(function (optionText, index) {
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox"; // 设置类型为复选框
+      checkbox.id = "checkbox" + (index + 1); // 为每个复选框分配唯一ID
+      checkbox.name = "options" + index + 1; // 如果需要在表单提交时收集这些值，可以设置相同的name属性
+
+      var label = document.createElement("label");
+      label.htmlFor = checkbox.id; // 关联label和checkbox
+      label.appendChild(document.createTextNode(optionText)); // 在label中添加文本
+
+      container.appendChild(checkbox); // 将复选框添加到容器中
+      container.appendChild(label); // 将label添加到容器中
+      container.appendChild(document.createElement("br")); // 添加换行，可按需调整布局
+    });
+
+    // 创建单次不通过按钮
+    var singleRefuseButton = document.createElement("button");
+    singleRefuseButton.id = "singleRefuseButton";
+    singleRefuseButton.innerHTML = "单次不通过（需先多选理由）";
+    singleRefuseButton.style.marginTop = "10px";
+    container.appendChild(singleRefuseButton);
+    singleRefuseButton.addEventListener("click", clickRefuseBtn);
+
+    containerDiv.appendChild(container); // 将容器添加到页面中
 
     // 使元素可拖动的函数
     function makeElementDraggable(element) {
@@ -196,6 +253,82 @@
         }
       }
     }
+  }
+
+  async function clickRefuseBtn() {
+    var selectedTexts = readCheckboxValues();
+    if (selectedTexts) {
+      console.log("选中的理由:", selectedTexts);
+      // 这里可以根据需要处理选中的理由字符串，比如提交到服务器等
+
+      const inputSelector = "button.online-review";
+      const inputElement = document.querySelector(inputSelector);
+      if (inputElement) {
+        // inputElement.value = id; // 填充ID
+        // 模拟点击按钮
+        inputElement.click();
+
+        await sleepSec(1000);
+        console.log("");
+        let radios = document.querySelectorAll("input.ant-radio-input");
+        let radio;
+        for (let i = 0; i < radios.length; i++) {
+          const e = radios[i];
+          if (
+            e.parentElement?.parentElement?.children?.length > 1 &&
+            e.parentElement?.parentElement?.children[1]?.innerText == "不通过"
+          ) {
+            radio = e;
+          }
+        }
+        if (radio) {
+          radio.click();
+          await sleepSec(100);
+          let textbox = document.querySelector(
+            ".ant-tabs-content-holder .ant-tabs-content .ng-star-inserted textarea"
+          );
+          if (textbox) {
+            textbox.value = selectedTexts;
+          }
+          await sleepSec(200);
+
+          // let saveBtn = document.querySelector(
+          //   ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
+          // );
+          // saveBtn.click();
+
+          // await sleepSec(600);
+          // let closeBtn = document.querySelector(
+          //   ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+          // );
+          // closeBtn.click();
+          // await sleepSec(600);
+          // let nextBtn = document.querySelector(
+          //   ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+          // );
+          // nextBtn.click();
+        }
+      }
+    } else {
+      alert("请至少选择一个理由");
+    }
+  }
+
+  // 新增函数：读取所有选中的多选框的文本值并拼接
+  function readCheckboxValues() {
+    var checkboxes = document.querySelectorAll(
+      '#myCheckbox input[type="checkbox"]:checked'
+    ); // 选取所有被选中的复选框
+    var selectedOptions = []; // 用于存储选中的选项文本
+
+    checkboxes.forEach(function (checkbox) {
+      var label = checkbox.labels[0];
+      if (label) {
+        selectedOptions.push(label.innerText);
+      }
+    });
+
+    return selectedOptions.join("。"); // 将数组转换为以逗号分隔的字符串并返回
   }
 
   function readTextareaContent() {}
