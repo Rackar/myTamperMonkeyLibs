@@ -46,6 +46,29 @@
     containerDiv.style.top = "10px";
     document.body.appendChild(containerDiv);
 
+    // 创建关闭按钮
+    var closeButton = document.createElement("button");
+    closeButton.innerHTML = "&times;"; // 使用HTML实体表示关闭图标
+    closeButton.style.position = "absolute";
+    closeButton.style.top = "5px"; // 调整距离顶部的距离
+    closeButton.style.right = "5px"; // 距离右边缘的距离
+    closeButton.style.background = "#ccc";
+    closeButton.style.border = "none";
+    closeButton.style.color = "#fff";
+    // closeButton.style.padding = "2px 5px";
+    closeButton.style.cursor = "pointer";
+    closeButton.style.borderRadius = "50%"; // 使按钮呈圆形
+    closeButton.title = "关闭后需刷新页面重新打开"; // 添加title属性
+
+    // 绑定点击事件以隐藏或删除containerDiv
+    closeButton.onclick = function () {
+      containerDiv.style.display = "none"; // 隐藏div
+      // 或者使用以下代码来彻底从DOM中移除div
+      // containerDiv.parentNode.removeChild(containerDiv);
+    };
+
+    // 将关闭按钮添加到containerDiv中
+    containerDiv.appendChild(closeButton);
     // 使整个div可拖动
     makeElementDraggable(containerDiv);
 
@@ -73,7 +96,7 @@
     // 创建单次通过按钮
     var singleButton = document.createElement("button");
     singleButton.id = "singleButton";
-    singleButton.innerHTML = "单次通过（需先进入查看详情页）";
+    singleButton.innerHTML = "√ 单次通过（需先进入查看详情页）";
     singleButton.style.marginTop = "10px";
     containerDiv.appendChild(singleButton);
     singleButton.addEventListener("click", clickSaveBtn);
@@ -118,10 +141,20 @@
     // 创建单次不通过按钮
     var singleRefuseButton = document.createElement("button");
     singleRefuseButton.id = "singleRefuseButton";
-    singleRefuseButton.innerHTML = "单次不通过（需先多选理由）";
+    singleRefuseButton.innerHTML = "× 单次不通过（需多选理由）";
     singleRefuseButton.style.marginTop = "10px";
     container.appendChild(singleRefuseButton);
     singleRefuseButton.addEventListener("click", clickRefuseBtn);
+
+    // 创建清除对勾按钮
+    var singleClearButton = document.createElement("button");
+    singleClearButton.id = "singleClearButton";
+    singleClearButton.innerHTML = "清除对勾";
+    singleClearButton.title = "每次需手动清空所有对勾选择";
+    singleClearButton.style.marginTop = "5px";
+    singleClearButton.style.marginLeft = "10px";
+    container.appendChild(singleClearButton);
+    singleClearButton.addEventListener("click", uncheckAllBox);
 
     containerDiv.appendChild(container); // 将容器添加到页面中
 
@@ -258,6 +291,11 @@
       console.log("选中的理由:", selectedTexts);
       // 这里可以根据需要处理选中的理由字符串，比如提交到服务器等
 
+      let panelShow = document.querySelector(".spotDetial.showSpotDetial");
+      if (panelShow && panelShow.hidden == true) {
+        return alert("请先进入详情页面查看举证情况");
+      }
+
       const inputSelector = "button.online-review";
       const inputElement = document.querySelector(inputSelector);
       if (inputElement) {
@@ -308,6 +346,17 @@
       }
     } else {
       alert("请至少选择一个理由");
+    }
+  }
+
+  async function uncheckAllBox() {
+    let checkBoxes = document.querySelectorAll(
+      "#myCheckbox input[type=checkbox]"
+    );
+    for (let i = 0; i < checkBoxes.length; i++) {
+      if (checkBoxes[i].checked) {
+        checkBoxes[i].checked = false;
+      }
     }
   }
 
