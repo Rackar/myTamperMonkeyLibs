@@ -46,8 +46,8 @@
     containerDiv.style.zIndex = "9999";
     containerDiv.style.backgroundColor = "#fff";
     containerDiv.style.border = "1px solid #ccc";
-    containerDiv.style.padding = "15px";
-    containerDiv.style.paddingTop = "22px";
+    containerDiv.style.padding = "25px";
+    containerDiv.style.paddingTop = "30px";
     containerDiv.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)";
     containerDiv.style.display = "grid";
     containerDiv.style.backgroundColor = "#efefef";
@@ -108,7 +108,9 @@
     passContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
     passContainer.style.flexWrap = "wrap"; // 允许换行
     passContainer.style.justifyContent = "center"; // 水平居中
-    passContainer.style.paddingTop = "20px";
+    passContainer.style.marginTop = "20px";
+    passContainer.style.cursor = "default";
+    passContainer.style.backgroundColor = "#e6e6e6";
     passContainer.id = "myPassPanel";
     containerDiv.appendChild(passContainer); // 将容器添加到页面中
 
@@ -129,7 +131,7 @@
       radioButton.type = "radio"; // 设置类型为单选框
       radioButton.name = "radioPass"; // 一个组唯一ID
       radioButton.value = optionText.value;
-      radioButton.id = "checkbox" + (index + 1);
+      radioButton.id = "radioPass" + (index + 1);
 
       radioButton.addEventListener("change", function () {
         selectedValue = this;
@@ -137,9 +139,12 @@
         // 在这里处理单选按钮变化后的逻辑
       });
       var div = document.createElement("div");
+      div.style.display = "flex";
+      div.style.alignItems = "normal";
 
       var label = document.createElement("label");
       label.htmlFor = radioButton.id;
+      label.style.marginLeft = "2px";
       label.appendChild(document.createTextNode(optionText.text));
 
       div.appendChild(radioButton);
@@ -157,7 +162,7 @@
     //  singleButton.style.backgroundColor = "#edffed";
     singleButton.classList.add("hoverbtn");
     singleButton.classList.add("passbtn");
-    passContainer.appendChild(singleButton);
+    containerDiv.appendChild(singleButton);
     singleButton.addEventListener("click", clickSaveBtn);
 
     // // 创建有手续通过按钮
@@ -192,12 +197,15 @@
       "卫星影像套合图红框位置不是下发的图斑位置",
       "材料内图斑号不符",
     ];
-    var container = document.createElement("div"); // 创建一个容器来存放所有的选择框
-    container.style.display = "block"; // 改变布局方式以便更好地排列复选框
-    container.style.flexWrap = "wrap"; // 允许换行
-    container.style.justifyContent = "center"; // 水平居中
-    container.style.paddingTop = "20px";
-    container.id = "myCheckbox";
+    var refuseContainer = document.createElement("div"); // 创建一个容器来存放所有的选择框
+    refuseContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
+    refuseContainer.style.flexWrap = "wrap"; // 允许换行
+    refuseContainer.style.justifyContent = "center"; // 水平居中
+    refuseContainer.style.marginTop = "20px";
+    refuseContainer.style.cursor = "default";
+    refuseContainer.style.backgroundColor = "#e6e6e6";
+    refuseContainer.id = "myCheckbox";
+    containerDiv.appendChild(refuseContainer); // 将容器添加到页面中
 
     // 动态创建多个复选框
     options.forEach(function (optionText, index) {
@@ -206,15 +214,22 @@
       checkbox.id = "checkbox" + (index + 1); // 为每个复选框分配唯一ID
       checkbox.name = "options" + index + 1; // 如果需要在表单提交时收集这些值，可以设置相同的name属性
 
+      var div = document.createElement("div");
+      div.style.display = "flex";
+      div.style.alignItems = "normal";
+
       var label = document.createElement("label");
       label.htmlFor = checkbox.id; // 关联label和checkbox
+      label.style.marginLeft = "2px";
       label.appendChild(document.createTextNode(optionText)); // 在label中添加文本
 
-      container.appendChild(checkbox); // 将复选框添加到容器中
-      container.appendChild(label); // 将label添加到容器中
-      container.appendChild(document.createElement("br")); // 添加换行，可按需调整布局
+      div.appendChild(checkbox); // 将复选框添加到容器中
+      div.appendChild(label); // 将label添加到容器中
+      refuseContainer.appendChild(div); // 添加换行，可按需调整布局
     });
 
+    var reBtnContainer = document.createElement("div");
+    containerDiv.appendChild(reBtnContainer);
     // 创建单次不通过按钮
     var singleRefuseButton = document.createElement("button");
     singleRefuseButton.id = "singleRefuseButton";
@@ -225,7 +240,7 @@
     //  singleRefuseButton.style.hover = "background-color: #ff0000";
     singleRefuseButton.classList.add("hoverbtn");
     singleRefuseButton.classList.add("refusebtn");
-    container.appendChild(singleRefuseButton);
+    reBtnContainer.appendChild(singleRefuseButton);
     singleRefuseButton.addEventListener("click", clickRefuseBtn);
 
     // 创建清除对勾按钮
@@ -237,10 +252,8 @@
     singleClearButton.style.marginTop = "5px";
     singleClearButton.style.marginLeft = "10px";
 
-    container.appendChild(singleClearButton);
+    reBtnContainer.appendChild(singleClearButton);
     singleClearButton.addEventListener("click", uncheckAllBox);
-
-    containerDiv.appendChild(container); // 将容器添加到页面中
 
     // 使元素可拖动的函数
     function makeElementDraggable(element) {
@@ -252,11 +265,13 @@
       element.onmousedown = dragMouseDown;
 
       function dragMouseDown(e) {
-        e.preventDefault();
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
+        if (e.target === element) {
+          e.preventDefault();
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          document.onmouseup = closeDragElement;
+          document.onmousemove = elementDrag;
+        }
       }
 
       function elementDrag(e) {
@@ -356,37 +371,59 @@
       if (radio) {
         radio.click();
         await sleepSec(100);
-        let selectors = document.querySelectorAll(
-          "nz-select-search.ant-select-selection-search.ng-star-inserted"
+
+        let textbox = document.querySelector(
+          ".ant-tabs-content-holder .ant-tabs-content .ng-star-inserted textarea"
         );
-        if (selectors.length > 5) {
-          let selector = selectors[5];
-          selector.click();
-
-          await sleepSec(500);
-
-          let option = document.querySelector(
-            'nz-option-item[title="审核通过"].ant-select-item-option-active.ant-select-item-option'
-          );
-          option.click();
-          clearRadioSelection();
-          // await sleepSec(200);
-          // let saveBtn = document.querySelector(
-          //   ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
-          // );
-          // saveBtn.click();
-
-          // await sleepSec(600);
-          // let closeBtn = document.querySelector(
-          //   ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
-          // );
-          // closeBtn.click();
-          // await sleepSec(600);
-          // let nextBtn = document.querySelector(
-          //   ".ant-table-tbody td.ant-table-cell-fix-right-first a"
-          // );
-          // nextBtn.click();
+        if (textbox) {
+          textbox.value = radioPass;
         }
+
+        await sleepSec(200);
+        clearRadioSelection();
+        let saveBtn = document.querySelector(
+          ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
+        );
+        saveBtn.click();
+        await sleepSec(600);
+        let closeBtn = document.querySelector(
+          ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+        );
+        closeBtn.click();
+        await sleepSec(600);
+        let nextBtn = document.querySelector(
+          ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+        );
+        nextBtn.click();
+
+        // let selectors = document.querySelectorAll(
+        //   "nz-select-search.ant-select-selection-search.ng-star-inserted"
+        // );
+        // if (selectors.length > 5) {
+        // let selector = selectors[5];
+        // selector.click();
+        // await sleepSec(500);
+        // let option = document.querySelector(
+        //   'nz-option-item[title="审核通过"].ant-select-item-option-active.ant-select-item-option'
+        // );
+        // option.click();
+        // clearRadioSelection();
+        // await sleepSec(200);
+        // let saveBtn = document.querySelector(
+        //   ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
+        // );
+        // saveBtn.click();
+        // await sleepSec(600);
+        // let closeBtn = document.querySelector(
+        //   ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+        // );
+        // closeBtn.click();
+        // await sleepSec(600);
+        // let nextBtn = document.querySelector(
+        //   ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+        // );
+        // nextBtn.click();
+        // }
       }
     } else {
       return alert("请先进入详情页面查看举证情况");
