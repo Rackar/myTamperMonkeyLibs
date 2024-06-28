@@ -13,7 +13,7 @@
 
   hideUI();
   addUI();
-  function hideUI(params) {
+  function hideUI() {
     setInterval(function () {
       var divCollectInfo = document.querySelector(".collect-info");
 
@@ -83,27 +83,6 @@
     // 使整个div可拖动
     makeElementDraggable(containerDiv);
 
-    //#region 创建可拖动的textarea元素
-
-    // // 创建可拖动的textarea元素
-    // var textarea = document.createElement("textarea");
-    // textarea.id = "customTextarea";
-    // textarea.style.width = "300px";
-    // textarea.style.height = "100px";
-    // // textarea.style.resize = "both"; // 允许调整大小
-    // containerDiv.appendChild(textarea);
-
-    // // 创建开始执行按钮
-    // var startButton = document.createElement("button");
-    // startButton.id = "executeButton";
-    // startButton.innerHTML = "开始批量执行（开发中）";
-    // startButton.style.marginTop = "10px";
-    // containerDiv.appendChild(startButton);
-
-    // // 绑定按钮点击事件
-    // startButton.addEventListener("click", readTextareaContent);
-    // #endregion
-
     var passContainer = document.createElement("div"); // 创建一个容器来存放所有的选择框
     passContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
     passContainer.style.flexWrap = "wrap"; // 允许换行
@@ -164,24 +143,6 @@
     singleButton.classList.add("passbtn");
     containerDiv.appendChild(singleButton);
     singleButton.addEventListener("click", clickSaveBtn);
-
-    // // 创建有手续通过按钮
-    // var singleShouxuButton = document.createElement("button");
-    // singleShouxuButton.id = "singleShouxuButton";
-    // singleShouxuButton.innerHTML = "√ 有手续通过（无套合）";
-    // singleShouxuButton.style.marginTop = "10px";
-    // singleShouxuButton.style.cursor = "pointer";
-    // singleShouxuButton.addEventListener("click", clickShouxuPassBtn);
-    // passContainer.appendChild(singleShouxuButton);
-
-    // // 创建住宅类通过按钮
-    // var singleZhuzhaiButton = document.createElement("button");
-    // singleZhuzhaiButton.id = "singleZhuzhaiButton";
-    // singleZhuzhaiButton.innerHTML = "√ 住宅类通过";
-    // singleZhuzhaiButton.style.marginTop = "10px";
-    // singleZhuzhaiButton.style.cursor = "pointer";
-    // singleZhuzhaiButton.addEventListener("click", clickZhuzhaiPassBtn);
-    // passContainer.appendChild(singleZhuzhaiButton);
 
     // 创建多选框组
     var options = [
@@ -306,9 +267,6 @@
     console.log("所有单选按钮的值已清空");
   }
 
-  // 初始化
-  function init() {}
-
   // 处理CSV文本
   function processCsv(csvText) {
     const lines = csvText.split("\n");
@@ -377,14 +335,17 @@
         );
         if (textbox) {
           textbox.value = radioPass;
+          textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
         }
 
         await sleepSec(200);
-        clearRadioSelection();
+
         let saveBtn = document.querySelector(
           ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
         );
         saveBtn.click();
+        await sleepSec(100);
+        clearRadioSelection();
         await sleepSec(600);
         let closeBtn = document.querySelector(
           ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
@@ -395,44 +356,11 @@
           ".ant-table-tbody td.ant-table-cell-fix-right-first a"
         );
         nextBtn.click();
-
-        // let selectors = document.querySelectorAll(
-        //   "nz-select-search.ant-select-selection-search.ng-star-inserted"
-        // );
-        // if (selectors.length > 5) {
-        // let selector = selectors[5];
-        // selector.click();
-        // await sleepSec(500);
-        // let option = document.querySelector(
-        //   'nz-option-item[title="审核通过"].ant-select-item-option-active.ant-select-item-option'
-        // );
-        // option.click();
-        // clearRadioSelection();
-        // await sleepSec(200);
-        // let saveBtn = document.querySelector(
-        //   ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
-        // );
-        // saveBtn.click();
-        // await sleepSec(600);
-        // let closeBtn = document.querySelector(
-        //   ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
-        // );
-        // closeBtn.click();
-        // await sleepSec(600);
-        // let nextBtn = document.querySelector(
-        //   ".ant-table-tbody td.ant-table-cell-fix-right-first a"
-        // );
-        // nextBtn.click();
-        // }
       }
     } else {
       return alert("请先进入详情页面查看举证情况");
     }
   }
-
-  function clickShouxuPassBtn(params) {}
-
-  function clickZhuzhaiPassBtn(params) {}
 
   async function clickRefuseBtn() {
     var selectedTexts = readCheckboxValues();
@@ -473,6 +401,7 @@
           );
           if (textbox) {
             textbox.value = selectedTexts;
+            textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
           }
           await sleepSec(200);
 
@@ -527,39 +456,4 @@
 
     return selectedOptions.join("。"); // 将数组转换为以逗号分隔的字符串并返回
   }
-
-  function readTextareaContent() {}
-  // 填充表单并点击按钮的示例函数
-  async function fillAndSubmitForm(id) {
-    // 请根据实际页面结构调整以下选择器
-
-    if (true) {
-      // 等待一段时间，确保操作完成（实际中可能需要更复杂的异步处理）
-      waitForPageLoadCompletion(() => {
-        //    document.querySelector(button2Selector).click();
-      }); // 延迟时间根据实际情况调整
-    } else {
-      console.error("Input element not found");
-    }
-  }
-
-  // 检查页面是否加载完成
-  function waitForPageLoadCompletion(callback) {
-    let checkCount = 0;
-    const maxChecks = 10; // 最多重试次数
-    const checkInterval = setInterval(() => {
-      // 检查某个动态加载的内容是否稳定，或者某个特定的加载指示器是否消失
-      // 请根据实际情况调整选择器
-      const loadingIndicator = document.querySelector("#loading-indicator");
-      if (!loadingIndicator || checkCount >= maxChecks) {
-        clearInterval(checkInterval);
-        callback();
-      } else {
-        checkCount++;
-      }
-    }, 500); // 每半秒检查一次
-  }
-
-  // 启动脚本
-  init();
 })();
