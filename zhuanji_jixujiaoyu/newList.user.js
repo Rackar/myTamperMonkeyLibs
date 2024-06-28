@@ -108,105 +108,105 @@
   }
 
   function nextPage(params) {
-   
     var iframe = document.getElementById("bodyIframe");
     if (iframe?.contentDocument?.readyState == "complete") {
       var iframeDoc = iframe.contentWindow.document;
 
       // 获取页面上所有的按钮元素
-     var allButtons = iframeDoc.querySelectorAll(".layui-laypage-next");
+      var allButtons = iframeDoc.querySelectorAll(".layui-laypage-next");
       if (allButtons && allButtons.length) {
         allButtons[0].click();
       }
-  }
-
-  async function loopBtns(btns) {
-    for (let i = 0; i < btns.length; i++) {
-      const btn = btns[i];
-      btn.click();
-      await sleepTime(60 * 60);
     }
-  }
 
-  function clickNode(node) {
-    var divText = node.textContent || node.innerText;
-    console.log("Detected popup div with text:", divText);
-    // 这里可以添加你想要执行的操作，比如发送文本到服务器等
-
-    // 使用querySelector来查找子孙中的链接，假设链接有一个特定的类名'your-link-class'
-    var link = node.querySelector(".layui-layer-btn0");
-
-    // 检查链接是否存在
-    if (link && link.innerText == "确定") {
-      link.click();
-      // 关闭弹窗
-      setTimeout(() => {
-        var closeBtns = document.body.querySelectorAll(".layui-layer-close");
-        if (closeBtns && closeBtns.length) {
-          closeBtns[0].click();
-        }
-        setTimeout(() => {
-          clickUIbtn();
-        }, 3000);
-      }, 3000);
-
-      // 模拟点击事件
-      //link.dispatchEvent(clickEvent);
-    } else {
-      console.log("Link not found");
-    }
-  }
-
-  function findDialog() {
-    var targetDiv = document.getElementsByClassName("layui-layer-dialog");
-    if (targetDiv && targetDiv.length) {
-      console.log("5秒遍历找到", targetDiv);
-      clickNode(targetDiv[0]);
-    }
-  }
-
-  setInterval(findDialog, 5 * 1000);
-
-  function mainfun(btns) {
-    var trs = $("tbody tr");
-    // console.log("monkey");
-    // console.log(trs);
-
-    let arrNeed = [];
-    for (let index = 0; index < trs.length; index++) {
-      const tr = trs[index];
-      //   console.log(tr.children[4].innerText);
-      if (tr.children[4].innerText != "已完成") {
-        let url = tr.children[5].children[0].children[0].href;
-        let timeMin = tr.children[1].children[0].innerText;
-        timeMin = timeMin.replace("约", "");
-        timeMin = timeMin.replace("分钟", "");
-        // console.log(timeMin);
-        let time = (timeMin - 0 + 3) * 60;
-        if (tr.children[4].innerText != "未开始") {
-          let rate = tr.children[4].innerText;
-
-          time *= parseFloat(rate) / 100;
-          debugger;
-        }
-
-        // let time = (timeMin - 0 + 3) * 60;
-        let button = tr.children[5].children[0].children[0];
-        let obj = {
-          url,
-          time,
-          button,
-        };
-        arrNeed.push(obj);
-        // button.click()
-        // return;
+    async function loopBtns(btns) {
+      for (let i = 0; i < btns.length; i++) {
+        const btn = btns[i];
+        btn.click();
+        await sleepTime(60 * 60);
       }
     }
-    console.log(arrNeed);
 
-    doAllClassListen(arrNeed);
+    function clickNode(node) {
+      var divText = node.textContent || node.innerText;
+      console.log("Detected popup div with text:", divText);
+      // 这里可以添加你想要执行的操作，比如发送文本到服务器等
+
+      // 使用querySelector来查找子孙中的链接，假设链接有一个特定的类名'your-link-class'
+      var link = node.querySelector(".layui-layer-btn0");
+
+      // 检查链接是否存在
+      if (link && link.innerText == "确定") {
+        link.click();
+        // 关闭弹窗
+        setTimeout(() => {
+          var closeBtns = document.body.querySelectorAll(".layui-layer-close");
+          if (closeBtns && closeBtns.length) {
+            closeBtns[0].click();
+          }
+          setTimeout(() => {
+            clickUIbtn();
+          }, 3000);
+        }, 3000);
+
+        // 模拟点击事件
+        //link.dispatchEvent(clickEvent);
+      } else {
+        console.log("Link not found");
+      }
+    }
+
+    function findDialog() {
+      var targetDiv = document.getElementsByClassName("layui-layer-dialog");
+      if (targetDiv && targetDiv.length) {
+        console.log("5秒遍历找到", targetDiv);
+        clickNode(targetDiv[0]);
+      }
+    }
+
+    setInterval(findDialog, 5 * 1000);
+
+    function mainfun(btns) {
+      var trs = $("tbody tr");
+      // console.log("monkey");
+      // console.log(trs);
+
+      let arrNeed = [];
+      for (let index = 0; index < trs.length; index++) {
+        const tr = trs[index];
+        //   console.log(tr.children[4].innerText);
+        if (tr.children[4].innerText != "已完成") {
+          let url = tr.children[5].children[0].children[0].href;
+          let timeMin = tr.children[1].children[0].innerText;
+          timeMin = timeMin.replace("约", "");
+          timeMin = timeMin.replace("分钟", "");
+          // console.log(timeMin);
+          let time = (timeMin - 0 + 3) * 60;
+          if (tr.children[4].innerText != "未开始") {
+            let rate = tr.children[4].innerText;
+
+            time *= parseFloat(rate) / 100;
+            debugger;
+          }
+
+          // let time = (timeMin - 0 + 3) * 60;
+          let button = tr.children[5].children[0].children[0];
+          let obj = {
+            url,
+            time,
+            button,
+          };
+          arrNeed.push(obj);
+          // button.click()
+          // return;
+        }
+      }
+      console.log(arrNeed);
+
+      doAllClassListen(arrNeed);
+    }
+    setTimeout(addUI, 2000);
+
+    // Your code here...
   }
-  setTimeout(addUI, 2000);
-
-  // Your code here...
 })();
