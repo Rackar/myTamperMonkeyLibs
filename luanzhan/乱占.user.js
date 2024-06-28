@@ -81,23 +81,16 @@
     // 创建多选框组
     var options = [
       "现有手续无法证明",
-      "现场照片无法证明",
-      "补充批复的图斑位置套合图，或补充2012年套合影像",
-      "无手续证明",
       "补充有效用地手续",
-      "现有材料无法证明，补充2012年套合影像",
-      "补充土地证图斑位置套合图",
-      "图斑范围有房子，填报为住宅类",
-      "提供2024年套合影像",
-      "补充土地证的图斑位置套合图",
-      "房屋非2013年前建设，补充有效用地手续，或填报为住宅类",
-      "补充有效用地手续及图斑位置套合图",
-      "部分房屋非2013年前建设，补充有效用地手续，或填报为住宅类",
-      "提供用地审批手续",
-      "提供12年前（含12年）卫星影像套合图",
+      "现场照片无法证明",
       "拍摄图斑范围房屋近距离正面照片",
       "图斑内有房屋未拍摄",
+      "图斑范围有房子，应填报为住宅类",
+      "现有材料无法证明，补充2012年套合影像",
+      "拆除类提供2024年套合影像",
+      "提供12年前（含12年）卫星影像套合图",
       "卫星影像套合图红框位置不是下发的图斑位置",
+      "材料内图斑号不符",
     ];
     var container = document.createElement("div"); // 创建一个容器来存放所有的选择框
     container.style.display = "block"; // 改变布局方式以便更好地排列复选框
@@ -201,6 +194,10 @@
     const inputSelector = "button.online-review";
     const inputElement = document.querySelector(inputSelector);
     if (inputElement) {
+      let panelShow = document.querySelector(".spotDetial.showSpotDetial");
+      if (panelShow && panelShow.hidden == true) {
+        return alert("请先进入详情页面查看举证情况");
+      }
       // inputElement.value = id; // 填充ID
       // 模拟点击按钮
       inputElement.click();
