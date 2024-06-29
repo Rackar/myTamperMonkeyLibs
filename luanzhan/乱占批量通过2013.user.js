@@ -52,7 +52,7 @@
     containerDiv.style.display = "grid";
     containerDiv.style.backgroundColor = "#efefef";
     containerDiv.style.cursor = "move";
-
+    containerDiv.style.overflowWrap = "anywhere";
     containerDiv.style.left = "10px";
     containerDiv.style.top = "10px";
     document.body.appendChild(containerDiv);
@@ -177,7 +177,7 @@
     });
   }
 
-  async function clickSaveBtn() {
+  async function clickSaveBtn(id) {
     const inputSelector = "button.online-review";
     const inputElement = document.querySelector(inputSelector);
     if (inputElement) {
@@ -186,12 +186,48 @@
         throw new Error("请先进入详情页面查看举证情况");
       }
 
-      let radioPass = "2013年以前建设(影像)";
+      let radioPass = "2013年以前建设\n(省级: 影像判读)";
 
       // 模拟点击按钮
       inputElement.click();
 
       await sleepSec(802);
+
+      // 检查id是否一致
+      let _id = document.querySelector(
+        ".spotDetial .edit-body .spot-info .item-value"
+      );
+      if (_id) {
+        _id = _id.innerText.trim();
+        if (_id == id) {
+        } else {
+          await sleepSec(3302);
+        }
+      } else {
+        await sleepSec(3302);
+      }
+
+      // 等待第二次检查id是否一致
+      let _id2 = document.querySelector(
+        ".spotDetial .edit-body .spot-info .item-value"
+      );
+      if (_id2) {
+        _id2 = _id2.innerText.trim();
+        if (_id2 == id) {
+        } else {
+          let closeBtn = document.querySelector(
+            ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+          );
+          closeBtn.click();
+          return false;
+        }
+      } else {
+        let closeBtn = document.querySelector(
+          ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+        );
+        closeBtn.click();
+        return false;
+      }
 
       let radios = document.querySelectorAll("input.ant-radio-input");
       let radio;
@@ -233,10 +269,12 @@
     } else {
       throw new Error("请先进入详情页面查看举证情况", id);
     }
+    return true;
   }
 
   async function readTextareaContent() {
     let textbox = document.querySelector("#customTextarea");
+    let errorList = [];
 
     if (textbox) {
       console.info(textbox.value);
@@ -250,28 +288,63 @@
           .replace(",", "");
         if (id) idlist.push(id);
       }
+      const p = document.querySelector("#processBar");
 
       for (let i = 0; i < idlist.length; i++) {
         const id = idlist[i];
         console.info("开始第" + i + "条数据", id);
-        const p = document.querySelector("#processBar");
+
         p.innerText =
-          "正执行第" + (i + 1) + "条/总" + idlist.length + "条: " + id;
+          "正执行第" +
+          (i + 1) +
+          "条/总" +
+          idlist.length +
+          "条: " +
+          id +
+          ", 报错: " +
+          errorList.length +
+          "条";
         try {
           await searchId(id);
           await sleepSec(1001);
-          clickIntoInfo(id);
+          let noNetError = await clickIntoInfo(id);
+          if (!noNetError) {
+            if (!errorList.includes(id)) {
+              errorList.push(id);
+            }
+            continue;
+          }
           await sleepSec(1002);
-          await clickSaveBtn(id);
+          let noNetError2 = await clickSaveBtn(id);
+          if (!noNetError2) {
+            if (!errorList.includes(id)) {
+              errorList.push(id);
+            }
+            continue;
+          }
           await sleepSec(1003);
         } catch (error) {
           try {
             //网络不好重试一次
             await searchId(id);
             await sleepSec(5001);
-            clickIntoInfo(id);
+            let noNetError = await clickIntoInfo(id);
+            if (!noNetError) {
+              // 如果数组中不存在，则添加到数组中
+              if (!errorList.includes(id)) {
+                errorList.push(id);
+              }
+              continue;
+            }
+
             await sleepSec(5002);
-            await clickSaveBtn(id);
+            let noNetError2 = await clickSaveBtn(id);
+            if (!noNetError2) {
+              if (!errorList.includes(id)) {
+                errorList.push(id);
+              }
+              continue;
+            }
             await sleepSec(5003);
           } catch (error2) {
             console.info(error2);
@@ -279,7 +352,13 @@
           }
         }
       }
-      p.innerText = "已执行完毕，总" + idlist.length + "条。";
+      p.innerText =
+        "已执行完毕，总" +
+        idlist.length +
+        "条。其中出现问题" +
+        errorList.length +
+        "条，问题id号为 " +
+        errorList.join(",");
     }
   }
 
@@ -306,11 +385,30 @@
     }
   }
 
-  function clickIntoInfo() {
-    let nextBtn = document.querySelector(
-      ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+  async function clickIntoInfo(id) {
+    let idCell = document.querySelector(
+      ".ant-table-tbody .ant-table-row td.ant-table-cell-fix-left-last"
     );
-    nextBtn.click();
+    if (idCell.innerText.trim() == id) {
+      let nextBtn = document.querySelector(
+        ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+      );
+      nextBtn.click();
+    } else {
+      await sleepSec(3001);
+      idCell = document.querySelector(
+        ".ant-table-tbody .ant-table-row td.ant-table-cell-fix-left-last"
+      );
+      if (idCell.innerText.trim() == id) {
+        let nextBtn = document.querySelector(
+          ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+        );
+        nextBtn.click();
+      } else {
+        return false;
+      }
+    }
+    return true;
   }
   // 填充表单并点击按钮的示例函数
   async function fillAndSubmitForm(id) {

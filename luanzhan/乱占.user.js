@@ -114,7 +114,7 @@
 
       radioButton.addEventListener("change", function () {
         selectedValue = this;
-        console.log("当前选中:", selectedValue.value);
+        console.info("当前选中:", selectedValue.value);
         // 在这里处理单选按钮变化后的逻辑
       });
       var div = document.createElement("div");
@@ -264,7 +264,7 @@
     for (var i = 0; i < radios.length; i++) {
       radios[i].checked = false;
     }
-    console.log("所有单选按钮的值已清空");
+    console.info("所有单选按钮的值已清空");
   }
 
   // 处理CSV文本
@@ -288,12 +288,18 @@
 
   async function sleepSec(sec) {
     return new Promise((resolve) => {
-      console.log("准备等待", sec);
+      console.info("准备等待", sec);
       setTimeout(() => {
-        console.log("结束等待", sec);
+        console.info("结束等待", sec);
         resolve();
       }, sec);
     });
+  }
+
+  function getOperatorName() {
+    return document
+      .querySelector(".app-header .top_right label span")
+      .innerText.trim();
   }
 
   async function clickSaveBtn() {
@@ -334,7 +340,7 @@
           ".ant-tabs-content-holder .ant-tabs-content .ng-star-inserted textarea"
         );
         if (textbox) {
-          textbox.value = radioPass;
+          textbox.value = radioPass + " \n(省级: " + getOperatorName() + ")";
           textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
         }
 
@@ -365,7 +371,7 @@
   async function clickRefuseBtn() {
     var selectedTexts = readCheckboxValues();
     if (selectedTexts) {
-      console.log("选中的理由:", selectedTexts);
+      console.info("选中的理由:", selectedTexts);
       // 这里可以根据需要处理选中的理由字符串，比如提交到服务器等
 
       let panelShow = document.querySelector(".spotDetial.showSpotDetial");
@@ -381,7 +387,6 @@
         inputElement.click();
 
         await sleepSec(1000);
-        console.log("");
         let radios = document.querySelectorAll("input.ant-radio-input");
         let radio;
         for (let i = 0; i < radios.length; i++) {
@@ -400,7 +405,8 @@
             ".ant-tabs-content-holder .ant-tabs-content .ng-star-inserted textarea"
           );
           if (textbox) {
-            textbox.value = selectedTexts;
+            textbox.value =
+              selectedTexts + " \n(省级: " + getOperatorName() + ")";
             textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
           }
           await sleepSec(200);
