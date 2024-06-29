@@ -83,6 +83,8 @@
     // 使整个div可拖动
     makeElementDraggable(containerDiv);
 
+    //#region   添加通过UI框
+
     var passContainer = document.createElement("div"); // 创建一个容器来存放所有的选择框
     passContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
     passContainer.style.flexWrap = "wrap"; // 允许换行
@@ -100,7 +102,7 @@
       { text: "有手续（无套合）", value: "有手续" },
       { text: "不属于房屋", value: "不属于房屋" },
       { text: "已拆除", value: "已拆除" },
-      { text: "房屋属于住宅", value: "房屋属于住宅" },
+      { text: "其他类(住宅)", value: "其他类" },
     ];
     // 用于存储当前选中的值
     var selectedValue = "";
@@ -144,6 +146,8 @@
     containerDiv.appendChild(singleButton);
     singleButton.addEventListener("click", clickSaveBtn);
 
+    //#endregion
+
     // 创建多选框组
     var options = [
       "现有手续无法证明",
@@ -168,53 +172,71 @@
     refuseContainer.id = "myCheckbox";
     containerDiv.appendChild(refuseContainer); // 将容器添加到页面中
 
-    // 动态创建多个复选框
-    options.forEach(function (optionText, index) {
-      var checkbox = document.createElement("input");
-      checkbox.type = "checkbox"; // 设置类型为复选框
-      checkbox.id = "checkbox" + (index + 1); // 为每个复选框分配唯一ID
-      checkbox.name = "options" + index + 1; // 如果需要在表单提交时收集这些值，可以设置相同的name属性
+    // #region 多选退回理由模块
+    // // 动态创建多个复选框
+    // options.forEach(function (optionText, index) {
+    //   var checkbox = document.createElement("input");
+    //   checkbox.type = "checkbox"; // 设置类型为复选框
+    //   checkbox.id = "checkbox" + (index + 1); // 为每个复选框分配唯一ID
+    //   checkbox.name = "options" + index + 1; // 如果需要在表单提交时收集这些值，可以设置相同的name属性
 
-      var div = document.createElement("div");
-      div.style.display = "flex";
-      div.style.alignItems = "normal";
+    //   var div = document.createElement("div");
+    //   div.style.display = "flex";
+    //   div.style.alignItems = "normal";
 
-      var label = document.createElement("label");
-      label.htmlFor = checkbox.id; // 关联label和checkbox
-      label.style.marginLeft = "2px";
-      label.appendChild(document.createTextNode(optionText)); // 在label中添加文本
+    //   var label = document.createElement("label");
+    //   label.htmlFor = checkbox.id; // 关联label和checkbox
+    //   label.style.marginLeft = "2px";
+    //   label.appendChild(document.createTextNode(optionText)); // 在label中添加文本
 
-      div.appendChild(checkbox); // 将复选框添加到容器中
-      div.appendChild(label); // 将label添加到容器中
-      refuseContainer.appendChild(div); // 添加换行，可按需调整布局
-    });
+    //   div.appendChild(checkbox); // 将复选框添加到容器中
+    //   div.appendChild(label); // 将label添加到容器中
+    //   refuseContainer.appendChild(div); // 添加换行，可按需调整布局
+    // });
 
-    var reBtnContainer = document.createElement("div");
-    containerDiv.appendChild(reBtnContainer);
+    // var reBtnContainer = document.createElement("div");
+    // containerDiv.appendChild(reBtnContainer);
+    // // 创建单次不通过按钮
+    // var singleRefuseButton = document.createElement("button");
+    // singleRefuseButton.id = "singleRefuseButton";
+    // singleRefuseButton.innerHTML = "× 单次不通过（需多选理由）";
+    // singleRefuseButton.style.cursor = "pointer";
+    // singleRefuseButton.style.marginTop = "10px";
+    // // singleRefuseButton.style.backgroundColor = "#e8806b";
+    // //  singleRefuseButton.style.hover = "background-color: #ff0000";
+    // singleRefuseButton.classList.add("hoverbtn");
+    // singleRefuseButton.classList.add("refusebtn");
+    // reBtnContainer.appendChild(singleRefuseButton);
+    // singleRefuseButton.addEventListener("click", clickRefuseBtn);
+
+    // // 创建清除对勾按钮
+    // var singleClearButton = document.createElement("button");
+    // singleClearButton.id = "singleClearButton";
+    // singleClearButton.innerHTML = "清除对勾";
+    // singleClearButton.title = "每次需手动清空所有对勾选择";
+    // singleClearButton.style.cursor = "pointer";
+    // singleClearButton.style.marginTop = "5px";
+    // singleClearButton.style.marginLeft = "10px";
+
+    // reBtnContainer.appendChild(singleClearButton);
+    // singleClearButton.addEventListener("click", uncheckAllBox);
+
+    // #endregion
+
+    // #region 无理由退回模块
+
     // 创建单次不通过按钮
     var singleRefuseButton = document.createElement("button");
     singleRefuseButton.id = "singleRefuseButton";
-    singleRefuseButton.innerHTML = "× 单次不通过（需多选理由）";
+    singleRefuseButton.innerHTML = "× 不通过（需将图斑号及理由记录到表格中）";
     singleRefuseButton.style.cursor = "pointer";
     singleRefuseButton.style.marginTop = "10px";
     // singleRefuseButton.style.backgroundColor = "#e8806b";
     //  singleRefuseButton.style.hover = "background-color: #ff0000";
     singleRefuseButton.classList.add("hoverbtn");
     singleRefuseButton.classList.add("refusebtn");
-    reBtnContainer.appendChild(singleRefuseButton);
-    singleRefuseButton.addEventListener("click", clickRefuseBtn);
-
-    // 创建清除对勾按钮
-    var singleClearButton = document.createElement("button");
-    singleClearButton.id = "singleClearButton";
-    singleClearButton.innerHTML = "清除对勾";
-    singleClearButton.title = "每次需手动清空所有对勾选择";
-    singleClearButton.style.cursor = "pointer";
-    singleClearButton.style.marginTop = "5px";
-    singleClearButton.style.marginLeft = "10px";
-
-    reBtnContainer.appendChild(singleClearButton);
-    singleClearButton.addEventListener("click", uncheckAllBox);
+    refuseContainer.appendChild(singleRefuseButton);
+    singleRefuseButton.addEventListener("click", () => clickRefuseBtn(false));
 
     // 使元素可拖动的函数
     function makeElementDraggable(element) {
@@ -368,9 +390,9 @@
     }
   }
 
-  async function clickRefuseBtn() {
+  async function clickRefuseBtn(liyou = true) {
     var selectedTexts = readCheckboxValues();
-    if (selectedTexts) {
+    if (selectedTexts || !liyou) {
       console.info("选中的理由:", selectedTexts);
       // 这里可以根据需要处理选中的理由字符串，比如提交到服务器等
 
@@ -405,27 +427,33 @@
             ".ant-tabs-content-holder .ant-tabs-content .ng-star-inserted textarea"
           );
           if (textbox) {
-            textbox.value =
-              selectedTexts + " \n(省级: " + getOperatorName() + ")";
+            if (liyou) {
+              textbox.value =
+                selectedTexts + " \n(省级: " + getOperatorName() + ")";
+            } else {
+              textbox.value =
+                "退回重新填报 \n(省级: " + getOperatorName() + ")";
+            }
+
             textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
           }
           await sleepSec(200);
-
-          // let saveBtn = document.querySelector(
-          //   ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
-          // );
-          // saveBtn.click();
-
-          // await sleepSec(600);
-          // let closeBtn = document.querySelector(
-          //   ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
-          // );
-          // closeBtn.click();
-          // await sleepSec(600);
-          // let nextBtn = document.querySelector(
-          //   ".ant-table-tbody td.ant-table-cell-fix-right-first a"
-          // );
-          // nextBtn.click();
+          if (!liyou) {
+            let saveBtn = document.querySelector(
+              ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
+            );
+            saveBtn.click();
+            await sleepSec(600);
+            let closeBtn = document.querySelector(
+              ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+            );
+            closeBtn.click();
+            await sleepSec(600);
+            let nextBtn = document.querySelector(
+              ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+            );
+            nextBtn.click();
+          }
         }
       } else {
         return alert("请先进入详情页面查看举证情况");
