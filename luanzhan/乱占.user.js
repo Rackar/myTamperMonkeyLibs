@@ -173,70 +173,72 @@
     containerDiv.appendChild(refuseContainer); // 将容器添加到页面中
 
     // #region 多选退回理由模块
-    // // 动态创建多个复选框
-    // options.forEach(function (optionText, index) {
-    //   var checkbox = document.createElement("input");
-    //   checkbox.type = "checkbox"; // 设置类型为复选框
-    //   checkbox.id = "checkbox" + (index + 1); // 为每个复选框分配唯一ID
-    //   checkbox.name = "options" + index + 1; // 如果需要在表单提交时收集这些值，可以设置相同的name属性
+    // 动态创建多个复选框
+    options.forEach(function (optionText, index) {
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox"; // 设置类型为复选框
+      checkbox.id = "checkbox" + (index + 1); // 为每个复选框分配唯一ID
+      checkbox.name = "options" + index + 1; // 如果需要在表单提交时收集这些值，可以设置相同的name属性
 
-    //   var div = document.createElement("div");
-    //   div.style.display = "flex";
-    //   div.style.alignItems = "normal";
+      var div = document.createElement("div");
+      div.style.display = "flex";
+      div.style.alignItems = "normal";
 
-    //   var label = document.createElement("label");
-    //   label.htmlFor = checkbox.id; // 关联label和checkbox
-    //   label.style.marginLeft = "2px";
-    //   label.appendChild(document.createTextNode(optionText)); // 在label中添加文本
+      var label = document.createElement("label");
+      label.htmlFor = checkbox.id; // 关联label和checkbox
+      label.style.marginLeft = "2px";
+      label.appendChild(document.createTextNode(optionText)); // 在label中添加文本
 
-    //   div.appendChild(checkbox); // 将复选框添加到容器中
-    //   div.appendChild(label); // 将label添加到容器中
-    //   refuseContainer.appendChild(div); // 添加换行，可按需调整布局
-    // });
+      div.appendChild(checkbox); // 将复选框添加到容器中
+      div.appendChild(label); // 将label添加到容器中
+      refuseContainer.appendChild(div); // 添加换行，可按需调整布局
+    });
 
-    // var reBtnContainer = document.createElement("div");
-    // containerDiv.appendChild(reBtnContainer);
-    // // 创建单次不通过按钮
-    // var singleRefuseButton = document.createElement("button");
-    // singleRefuseButton.id = "singleRefuseButton";
-    // singleRefuseButton.innerHTML = "× 单次不通过（需多选理由）";
-    // singleRefuseButton.style.cursor = "pointer";
-    // singleRefuseButton.style.marginTop = "10px";
-    // // singleRefuseButton.style.backgroundColor = "#e8806b";
-    // //  singleRefuseButton.style.hover = "background-color: #ff0000";
-    // singleRefuseButton.classList.add("hoverbtn");
-    // singleRefuseButton.classList.add("refusebtn");
-    // reBtnContainer.appendChild(singleRefuseButton);
-    // singleRefuseButton.addEventListener("click", clickRefuseBtn);
-
-    // // 创建清除对勾按钮
-    // var singleClearButton = document.createElement("button");
-    // singleClearButton.id = "singleClearButton";
-    // singleClearButton.innerHTML = "清除对勾";
-    // singleClearButton.title = "每次需手动清空所有对勾选择";
-    // singleClearButton.style.cursor = "pointer";
-    // singleClearButton.style.marginTop = "5px";
-    // singleClearButton.style.marginLeft = "10px";
-
-    // reBtnContainer.appendChild(singleClearButton);
-    // singleClearButton.addEventListener("click", uncheckAllBox);
-
-    // #endregion
-
-    // #region 无理由退回模块
-
+    var reBtnContainer = document.createElement("div");
+    containerDiv.appendChild(reBtnContainer);
     // 创建单次不通过按钮
     var singleRefuseButton = document.createElement("button");
     singleRefuseButton.id = "singleRefuseButton";
-    singleRefuseButton.innerHTML = "× 不通过（需将图斑号及理由记录到表格中）";
+    singleRefuseButton.innerHTML = "× 单次不通过（需多选理由）";
     singleRefuseButton.style.cursor = "pointer";
     singleRefuseButton.style.marginTop = "10px";
     // singleRefuseButton.style.backgroundColor = "#e8806b";
     //  singleRefuseButton.style.hover = "background-color: #ff0000";
     singleRefuseButton.classList.add("hoverbtn");
     singleRefuseButton.classList.add("refusebtn");
-    refuseContainer.appendChild(singleRefuseButton);
-    singleRefuseButton.addEventListener("click", () => clickRefuseBtn(false));
+    reBtnContainer.appendChild(singleRefuseButton);
+    singleRefuseButton.addEventListener("click", clickRefuseBtn);
+
+    // 创建清除对勾按钮
+    var singleClearButton = document.createElement("button");
+    singleClearButton.id = "singleClearButton";
+    singleClearButton.innerHTML = "清除对勾";
+    singleClearButton.title = "每次需手动清空所有对勾选择";
+    singleClearButton.style.cursor = "pointer";
+    singleClearButton.style.marginTop = "5px";
+    singleClearButton.style.marginLeft = "10px";
+
+    reBtnContainer.appendChild(singleClearButton);
+    singleClearButton.addEventListener("click", uncheckAllBox);
+
+    // #endregion
+
+    // #region 无理由退回模块
+
+    // // 创建单次不通过按钮
+    // var singleRefuseButton = document.createElement("button");
+    // singleRefuseButton.id = "singleRefuseButton";
+    // singleRefuseButton.innerHTML = "× 不通过（需将图斑号及理由记录到表格中）";
+    // singleRefuseButton.style.cursor = "pointer";
+    // singleRefuseButton.style.marginTop = "10px";
+    // // singleRefuseButton.style.backgroundColor = "#e8806b";
+    // //  singleRefuseButton.style.hover = "background-color: #ff0000";
+    // singleRefuseButton.classList.add("hoverbtn");
+    // singleRefuseButton.classList.add("refusebtn");
+    // refuseContainer.appendChild(singleRefuseButton);
+    // singleRefuseButton.addEventListener("click", () => clickRefuseBtn(false));
+
+    // #endregion
 
     // 使元素可拖动的函数
     function makeElementDraggable(element) {
@@ -315,6 +317,36 @@
         console.info("结束等待", sec);
         resolve();
       }, sec);
+    });
+  }
+
+  async function postRefuseReason(id, code, region, remark, name, state = 2) {
+    return new Promise((resolve, reject) => {
+      const postData = {
+        id,
+        code,
+        region,
+        remark,
+        name,
+        state,
+      };
+
+      fetch("https://nmgwxyy.cn/alatan/lzgd/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify(postData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.info("响应:", data);
+          resolve(true);
+        })
+        .catch((error) => {
+          console.error("错误:", error);
+          resolve(false);
+        });
     });
   }
 
@@ -427,33 +459,47 @@
             ".ant-tabs-content-holder .ant-tabs-content .ng-star-inserted textarea"
           );
           if (textbox) {
+            textbox.value = "退回重新填报 \n(省级: " + getOperatorName() + ")";
             if (liyou) {
-              textbox.value =
-                selectedTexts + " \n(省级: " + getOperatorName() + ")";
-            } else {
-              textbox.value =
-                "退回重新填报 \n(省级: " + getOperatorName() + ")";
             }
 
             textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
           }
           await sleepSec(200);
-          if (!liyou) {
-            let saveBtn = document.querySelector(
-              ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
-            );
-            saveBtn.click();
-            await sleepSec(600);
-            let closeBtn = document.querySelector(
-              ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
-            );
-            closeBtn.click();
-            await sleepSec(600);
-            let nextBtn = document.querySelector(
-              ".ant-table-tbody td.ant-table-cell-fix-right-first a"
-            );
-            nextBtn.click();
+
+          let saveBtn = document.querySelector(
+            ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
+          );
+          saveBtn.click();
+
+          let idCell = document.querySelector(
+            ".ant-table-tbody .ant-table-row td.ant-table-cell-fix-left-last"
+          );
+          const id = idCell.innerText.trim();
+          const name = getOperatorName();
+          //  const date = new Date().toLocaleDateString();
+          const remark = selectedTexts;
+          let tds = document.querySelectorAll(
+            ".ant-table-tbody .ant-table-row td"
+          );
+          const region = tds[3].innerText.trim();
+
+          let postok = await postRefuseReason(id, "", region, remark, name, 2);
+          if (postok === false) {
+            alert("出现问题，提交保存失败。请记录图斑号和理由，在群里上报");
           }
+          uncheckAllBox();
+
+          await sleepSec(600);
+          let closeBtn = document.querySelector(
+            ".inner-content .content-edit.ant-layout button.ant-drawer-close i.anticon-close"
+          );
+          closeBtn.click();
+          await sleepSec(600);
+          let nextBtn = document.querySelector(
+            ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+          );
+          nextBtn.click();
         }
       } else {
         return alert("请先进入详情页面查看举证情况");
