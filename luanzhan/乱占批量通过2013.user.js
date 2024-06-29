@@ -11,6 +11,7 @@
 (function () {
   ("use strict");
 
+  let arr = ["150522003107", "150522003108", "150522003109", "150522003110"];
   hideUI();
   addUI();
   function hideUI() {
@@ -272,10 +273,12 @@
     return true;
   }
 
-  async function readTextareaContent() {
-    let textbox = document.querySelector("#customTextarea");
-    let errorList = [];
+  function getRows() {
+    return arr;
+  }
 
+  function getTextarea() {
+    let textbox = document.querySelector("#customTextarea");
     if (textbox) {
       console.info(textbox.value);
       let ids = textbox.value.split("\n");
@@ -288,33 +291,71 @@
           .replace(",", "");
         if (id) idlist.push(id);
       }
-      const p = document.querySelector("#processBar");
+      return idlist;
+    } else {
+      return [];
+    }
+  }
 
-      for (let i = 0; i < idlist.length; i++) {
-        const id = idlist[i];
-        console.info("开始第" + i + "条数据", id);
+  async function readTextareaContent() {
+    let hash = "#/mapRelevancy/dataCheck";
+    if (location.hash != hash) {
+      return alert("需进入审核上报页面: https://xxcj.mnr.gov.cn/" + hash);
+    }
 
-        p.innerText =
-          "正执行第" +
-          (i + 1) +
-          "条/总" +
-          idlist.length +
-          "条: " +
-          id +
-          ", 报错: " +
-          errorList.length +
-          "条";
+    // let idlist = getTextarea();
+    let idlist = getRows();
+    const errorList = [];
+    const p = document.querySelector("#processBar");
+
+    for (let i = 0; i < idlist.length; i++) {
+      const id = idlist[i];
+      console.info("开始第" + i + "条数据", id);
+
+      p.innerText =
+        "正执行第" +
+        (i + 1) +
+        "条/总" +
+        idlist.length +
+        "条: " +
+        id +
+        ", 报错: " +
+        errorList.length +
+        "条";
+      try {
+        await searchId(id);
+        await sleepSec(1001);
+        let noNetError = await clickIntoInfo(id);
+        if (!noNetError) {
+          if (!errorList.includes(id)) {
+            errorList.push(id);
+          }
+          continue;
+        }
+        await sleepSec(1002);
+        let noNetError2 = await clickSaveBtn(id);
+        if (!noNetError2) {
+          if (!errorList.includes(id)) {
+            errorList.push(id);
+          }
+          continue;
+        }
+        await sleepSec(1003);
+      } catch (error) {
         try {
+          //网络不好重试一次
           await searchId(id);
-          await sleepSec(1001);
+          await sleepSec(5001);
           let noNetError = await clickIntoInfo(id);
           if (!noNetError) {
+            // 如果数组中不存在，则添加到数组中
             if (!errorList.includes(id)) {
               errorList.push(id);
             }
             continue;
           }
-          await sleepSec(1002);
+
+          await sleepSec(5002);
           let noNetError2 = await clickSaveBtn(id);
           if (!noNetError2) {
             if (!errorList.includes(id)) {
@@ -322,44 +363,20 @@
             }
             continue;
           }
-          await sleepSec(1003);
-        } catch (error) {
-          try {
-            //网络不好重试一次
-            await searchId(id);
-            await sleepSec(5001);
-            let noNetError = await clickIntoInfo(id);
-            if (!noNetError) {
-              // 如果数组中不存在，则添加到数组中
-              if (!errorList.includes(id)) {
-                errorList.push(id);
-              }
-              continue;
-            }
-
-            await sleepSec(5002);
-            let noNetError2 = await clickSaveBtn(id);
-            if (!noNetError2) {
-              if (!errorList.includes(id)) {
-                errorList.push(id);
-              }
-              continue;
-            }
-            await sleepSec(5003);
-          } catch (error2) {
-            console.info(error2);
-            continue;
-          }
+          await sleepSec(5003);
+        } catch (error2) {
+          console.info(error2);
+          continue;
         }
       }
-      p.innerText =
-        "已执行完毕，总" +
-        idlist.length +
-        "条。其中出现问题" +
-        errorList.length +
-        "条，问题id号为 " +
-        errorList.join(",");
     }
+    p.innerText =
+      "已执行完毕，总" +
+      idlist.length +
+      "条。其中出现问题" +
+      errorList.length +
+      "条，问题id号为 " +
+      errorList.join(",");
   }
 
   async function searchId(id) {
