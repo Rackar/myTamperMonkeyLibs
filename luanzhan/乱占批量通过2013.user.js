@@ -11,7 +11,8 @@
 (function () {
   ("use strict");
 
-  let arr = ["150522003107", "150522003108", "150522003109", "150522003110"];
+  let arr = [];
+  let running = false;
   hideUI();
   addUI();
   function hideUI() {
@@ -97,9 +98,16 @@
     // 创建开始执行按钮
     var startButton = document.createElement("button");
     startButton.id = "executeButton";
-    startButton.innerHTML = "批量执行（开发中）";
+    startButton.innerHTML = "批量执行";
     startButton.style.marginTop = "10px";
     containerDiv.appendChild(startButton);
+
+    // 创建停止执行按钮
+    var stopButton = document.createElement("button");
+    stopButton.id = "stopButton";
+    stopButton.innerHTML = "停止任务";
+    stopButton.style.marginTop = "10px";
+    containerDiv.appendChild(stopButton);
 
     var processBar = document.createElement("div");
     processBar.id = "processBar";
@@ -109,6 +117,10 @@
 
     // 绑定按钮点击事件
     startButton.addEventListener("click", readTextareaContent);
+
+    stopButton.addEventListener("click", () => {
+      running = false;
+    });
     //#endregion
 
     // 使元素可拖动的函数
@@ -170,9 +182,9 @@
 
   async function sleepSec(sec) {
     return new Promise((resolve) => {
-      console.info("准备等待", sec);
+      // console.info("准备等待", sec);
       setTimeout(() => {
-        console.info("结束等待", sec);
+        //  console.info("结束等待", sec);
         resolve();
       }, sec);
     });
@@ -307,9 +319,14 @@
     let idlist = getRows();
     const errorList = [];
     const p = document.querySelector("#processBar");
+    running = true;
+    let breakid = -1;
 
     for (let i = 0; i < idlist.length; i++) {
       const id = idlist[i];
+      if (!running) {
+        break;
+      }
       console.info("开始第" + i + "条数据", id);
 
       p.innerText =
@@ -370,13 +387,29 @@
         }
       }
     }
-    p.innerText =
-      "已执行完毕，总" +
-      idlist.length +
-      "条。其中出现问题" +
-      errorList.length +
-      "条，问题id号为 " +
-      errorList.join(",");
+    if (running) {
+      p.innerText =
+        "已执行完毕，总" +
+        idlist.length +
+        "条。其中出现问题" +
+        errorList.length +
+        "条，问题id号为 " +
+        errorList.join(",");
+    } else {
+      p.innerText =
+        "已中断于第" +
+        breakid +
+        "条" +
+        " " +
+        idlist[breakid] +
+        ",总" +
+        idlist.length +
+        "条。其中出现问题" +
+        errorList.length +
+        "条，问题id号为 " +
+        errorList.join(",");
+    }
+    running = false;
   }
 
   async function searchId(id) {

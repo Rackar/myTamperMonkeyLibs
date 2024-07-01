@@ -153,6 +153,7 @@
       "现有手续无法证明",
       "补充有效用地手续",
       "现场照片无法证明",
+      "需补充实地照片",
       "拍摄图斑范围房屋近距离正面照片",
       "图斑内有房屋未拍摄",
       "图斑范围有房子，应填报为住宅类",
@@ -160,7 +161,8 @@
       "拆除类提供2024年套合影像",
       "提供12年前（含12年）卫星影像套合图",
       "卫星影像套合图红框位置不是下发的图斑位置",
-      "材料内图斑号不符",
+      "材料中的位置、面积或图斑号不符",
+      "不占耕需提供图斑与上一年度变更调查套合图",
     ];
     var refuseContainer = document.createElement("div"); // 创建一个容器来存放所有的选择框
     refuseContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
@@ -312,9 +314,9 @@
 
   async function sleepSec(sec) {
     return new Promise((resolve) => {
-      console.info("准备等待", sec);
+      // console.info("准备等待", sec);
       setTimeout(() => {
-        console.info("结束等待", sec);
+        // console.info("结束等待", sec);
         resolve();
       }, sec);
     });
