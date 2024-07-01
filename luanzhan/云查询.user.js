@@ -4,6 +4,7 @@
 // @version      2024-07-01
 // @description  国土云云查询，经纬度查询
 // @author       yx
+// @match        https://www.landcloud.org.cn/
 // @match        https://landcloud.org.cn/
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=landcloud.org.cn
 // @grant        none
@@ -11,8 +12,6 @@
 
 (function () {
   ("use strict");
-
-  let running = false;
 
   addUI();
 
@@ -84,12 +83,16 @@
     // 创建开始执行按钮
     var startButton = document.createElement("button");
     startButton.id = "executeButton";
-    startButton.innerHTML = "云查询面查询";
+    startButton.innerHTML = "云查询-面查询";
     startButton.style.marginTop = "10px";
     containerDiv.appendChild(startButton);
 
     // 绑定按钮点击事件
     startButton.addEventListener("click", readTextareaContent);
+
+    textarea.focus();
+
+    //#endregion
 
     // 使元素可拖动的函数
     function makeElementDraggable(element) {
@@ -98,35 +101,27 @@
         pos3 = 0,
         pos4 = 0;
 
-      // element.onmousedown = dragMouseDown;
-      element.addEventListener("mousedown", dragMouseDown);
-      element.addEventListener("dragstart", function (e) {
-        e.preventDefault();
-        e.stopPropagation(); // 阻止dragstart事件冒泡
-        // 这里可以添加拖拽开始的其他逻辑
-      });
+      element.onmousedown = dragMouseDown;
 
       function dragMouseDown(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log(e);
-        // if (e.target === element) {
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-        // }
+        if (e.target === element) {
+          e.preventDefault();
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          document.onmouseup = closeDragElement;
+          document.onmousemove = elementDrag;
+        }
       }
 
       function elementDrag(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        element.style.top = element.offsetTop - pos2 + "px!important";
-        element.style.left = element.offsetLeft - pos1 + "px!important";
+        if (e.target === element) {
+          pos1 = pos3 - e.clientX;
+          pos2 = pos4 - e.clientY;
+          pos3 = e.clientX;
+          pos4 = e.clientY;
+          element.style.top = element.offsetTop - pos2 + "px";
+          element.style.left = element.offsetLeft - pos1 + "px";
+        }
       }
 
       function closeDragElement() {
@@ -135,9 +130,6 @@
       }
     }
   }
-
-  // 初始化
-  function init() {}
 
   async function sleepSec(sec) {
     return new Promise((resolve) => {
@@ -156,9 +148,12 @@
       let ids = textbox.value.split("\n");
       let idlist = [];
       for (let i = 0; i < ids.length; i++) {
-        const id = ids[i]
+        let id = ids[i].trim();
+        if (!id) continue;
+        id = id
           .trim()
           .replace("\r", "")
+          .replace("\n", "")
           .replace("'", "")
           .replace('"', "")
           .replace(" ", ",")
@@ -183,15 +178,12 @@
     }
 
     let idlist = getTextarea();
-    // let idlist = getRows();
 
     let rows = document.querySelectorAll("#app .el-dialog__body .blockDialog");
 
     for (let i = 0; i < idlist.length; i++) {
       const id = idlist[i];
-      if (!running) {
-        break;
-      }
+
       console.info("开始第" + i + "条数据", id);
 
       let row = rows[i].querySelectorAll("input");
@@ -203,12 +195,9 @@
       await sleepSec(102);
       if (i == rows.length - 1 && i != idlist.length - 1) {
         rows[i].querySelector("img").click();
-        await sleepSec(503);
+        await sleepSec(203);
         rows = document.querySelectorAll("#app .el-dialog__body .blockDialog");
       }
     }
   }
-
-  // 启动脚本
-  init();
 })();
