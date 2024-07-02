@@ -322,6 +322,16 @@
     });
   }
 
+  /**
+   *
+   * @param {*} id
+   * @param {*} code
+   * @param {*} region
+   * @param {*} remark
+   * @param {*} name
+   * @param {number} state  1为通过 2为退回
+   * @returns promise: true为成功 false为失败
+   */
   async function postRefuseReason(id, code, region, remark, name, state = 2) {
     return new Promise((resolve, reject) => {
       const postData = {
@@ -406,6 +416,21 @@
           ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
         );
         saveBtn.click();
+        let idCell = document.querySelector(
+          ".ant-table-tbody .ant-table-row td.ant-table-cell-fix-left-last"
+        );
+        const id = idCell.innerText.trim();
+        const name = getOperatorName();
+        //  const date = new Date().toLocaleDateString();
+        const remark = radioPass;
+        let tds = document.querySelectorAll(
+          ".ant-table-tbody .ant-table-row td"
+        );
+        const region = tds[3].innerText.trim();
+        let postok = await postRefuseReason(id, "", region, remark, name, 1);
+        if (postok === false) {
+          alert("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
+        }
         await sleepSec(100);
         clearRadioSelection();
         await sleepSec(600);

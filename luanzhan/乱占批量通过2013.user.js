@@ -189,6 +189,51 @@
       }, sec);
     });
   }
+  function getOperatorName() {
+    return document
+      .querySelector(".app-header .top_right label span")
+      .innerText.trim();
+  }
+
+  /**
+   *
+   * @param {*} id
+   * @param {*} code
+   * @param {*} region
+   * @param {*} remark
+   * @param {*} name
+   * @param {number} state  1为通过 2为退回
+   * @returns promise: true为成功 false为失败
+   */
+  async function postRefuseReason(id, code, region, remark, name, state = 2) {
+    return new Promise((resolve, reject) => {
+      const postData = {
+        id,
+        code,
+        region,
+        remark,
+        name,
+        state,
+      };
+
+      fetch("https://nmgwxyy.cn/alatan/lzgd/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json;charset=utf-8",
+        },
+        body: JSON.stringify(postData),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          console.info("响应:", data);
+          resolve(true);
+        })
+        .catch((error) => {
+          console.error("错误:", error);
+          resolve(false);
+        });
+    });
+  }
 
   async function clickSaveBtn(id) {
     const inputSelector = "button.online-review";
@@ -271,6 +316,24 @@
           ".ant-tabs-content-holder .ng-star-inserted button.ant-btn-primary"
         );
         saveBtn.click();
+
+        //  const date = new Date().toLocaleDateString();
+        const remark = radioPass;
+        let tds = document.querySelectorAll(
+          ".ant-table-tbody .ant-table-row td"
+        );
+        const region = tds[3].innerText.trim();
+        let postok = await postRefuseReason(
+          id,
+          "",
+          region,
+          remark,
+          "影像判读",
+          1
+        );
+        if (postok === false) {
+          console.error("出现问题，提交保存失败。", id);
+        }
         await sleepSec(105);
 
         await sleepSec(806);

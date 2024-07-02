@@ -141,31 +141,89 @@
     });
   }
 
+  function checkTextInput(stringin = "") {
+    let dataArr = [];
+
+    function trim(str) {
+      //使用正则表达式,\s为空格，^\s为开头的空格，*代表0个或多个，\s*$为结尾的零个或多个空格
+      const reg = /^\s*|\s*$/g;
+      return str.replace(reg, "");
+    }
+    let string = trim(stringin);
+
+    string.replace("\r\n", "\n");
+    let strArr = string.split("\n");
+    let splitChars = [",", "，", "\t", " "];
+    for (let str of strArr) {
+      //替换连续空格为1个
+      const reg2 = /\s+/g;
+      str = str.replace(reg2, " ");
+      str = trim(str);
+      //如果本行无有效内容
+      if (!str || str.length <= 2) {
+        continue;
+      }
+      let splitIndex = -1;
+
+      for (const split of splitChars) {
+        let i = str.indexOf(split);
+        if (i != -1) {
+          splitIndex = i;
+          break;
+        }
+      }
+
+      //如果没匹配到
+      if (splitIndex == -1) {
+        continue;
+      }
+      console.log(
+        "分割后",
+        str.substring(0, splitIndex),
+        str.substring(splitIndex + 1)
+      );
+      try {
+        const x = Number(trim(str.substring(0, splitIndex)));
+        const y = Number(trim(str.substring(splitIndex + 1)));
+        dataArr.push([x, y]);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (dataArr.length <= 2) {
+      console.log("错误：有效点数不足以构面");
+      return [];
+    }
+
+    return dataArr;
+  }
+
   function getTextarea() {
     let textbox = document.querySelector("#customTextarea");
     if (textbox) {
       console.info(textbox.value);
-      let ids = textbox.value.split("\n");
-      let idlist = [];
-      for (let i = 0; i < ids.length; i++) {
-        let id = ids[i].trim();
-        if (!id) continue;
-        id = id
-          .trim()
-          .replace("\r", "")
-          .replace("\n", "")
-          .replace("'", "")
-          .replace('"', "")
-          .replace(" ", ",")
-          .split(",")
-          .filter((e) => {
-            return e.trim() != "";
-          });
-        if (id) {
-          idlist.push(id);
-        }
-      }
-      return idlist;
+      return checkTextInput(textbox.value);
+      // let ids = textbox.value.split("\n");
+      // let idlist = [];
+      // for (let i = 0; i < ids.length; i++) {
+      //   let id = ids[i].trim();
+      //   if (!id) continue;
+      //   id = id
+      //     .trim()
+      //     .replace("\r", "")
+      //     .replace("\n", "")
+      //     .replace("'", "")
+      //     .replace('"', "")
+      //     .replace(" ", ",")
+      //     .split(",")
+      //     .filter((e) => {
+      //       return e.trim() != "";
+      //     });
+      //   if (id) {
+      //     idlist.push(id);
+      //   }
+      // }
+      // return idlist;
     } else {
       return [];
     }
