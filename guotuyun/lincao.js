@@ -4,6 +4,7 @@
 // @description  国土云林草专项1-5符合的自动通过
 // @author       rackar
 // @match        https://landcloud.org.cn/*
+// @match        https://jg.landcloud.org.cn:5443/main/list/lddjzxdk/1/xftbsj
 // @require      https://cdn.bootcss.com/jquery/2.2.1/jquery.js
 // @grant        none
 // ==/UserScript==
@@ -28,15 +29,105 @@
       } else if (location.href.indexOf("jg.landcloud.org.cn:5443") > -1) {
         // iframe内
         console.log("进入iframe内部5443");
+      } else {
+        // 其他页面
+        console.log("其他页面");
       }
-    }, 200);
+    }, 100);
+    // $(document).ready(function () {
+    //   setTimeout(function () {
+    //     var iframe = $("#activeIframe")[0].contentWindow;
+    //     var contentDoc = iframe.document || iframe.contentWindow.document;
+
+    //     var element = $(contentDoc).find("#app");
+    //     console.log(element);
+    //   }, 10000);
+
+    //   // 现在你可以操作element了
+    // });
   }
 
-  function findConditionAndNext() {
+  async function findConditionAndNext() {
     if (true) {
-      let idInput = document.querySelector(
-        '#activeIframe #app [role="tablist"] [role="tabpanel"]  .el-form-item__content'
+      let iframe = document.querySelector("iframe");
+      let doc = iframe.contentDocument;
+      let title = doc.querySelectorAll("form .comgroupparent"); //3个
+
+      let divDiaochaXinxi = title[1];
+      let subDiaocha = divDiaochaXinxi.querySelectorAll(".el-form-item"); //48个
+      let shengji = null;
+      let allow = 0;
+      for (let i = 0; i < subDiaocha.length; i++) {
+        const item = subDiaocha[i];
+        let label = item.children[0].innerText;
+        let value = item.children[1];
+        if (
+          label == "县级林草部门地类认定结果" ||
+          label == "县级调查部门地类认定结果"
+        ) {
+          let option = value.querySelector(
+            "li.el-select-dropdown__item.selected"
+          );
+          if (option) {
+            let text = option.innerText;
+            if (text === "认定2023年“一上”成果") allow++;
+            console.log(label + "：" + text, allow);
+          } else {
+            console.log(label + "： 未找到");
+          }
+        } else if (
+          label == "市级林草部门是否认定县级核实结论" ||
+          label == "市级调查部门是否认定县级核实结论" ||
+          label == "省级林草部门是否认定县级核实结论"
+        ) {
+          let radio = value.querySelector(
+            "label.el-radio.is-disabled.is-checked"
+          );
+          if (radio) {
+            let text = radio.innerText;
+            if (text.trim() === "是") allow++;
+            console.log(label + "：" + text, allow);
+          } else {
+            console.log(label + "： 未找到");
+          }
+        } else if (label == "省级调查部门是否认定县级核实结论") {
+          shengji = value.querySelector("label.el-radio");
+        }
+      }
+      if (allow === 5) {
+        console.log("通过,点击按钮");
+        shengji.click();
+        await sleepTime(0.2);
+        let divShenheTuban = title[2];
+        let passRadio = divShenheTuban.querySelector("label.el-radio");
+        passRadio.click();
+        await sleepTime(0.2);
+        let submitBtn = divShenheTuban.querySelector(
+          "button.el-button.el-button--success"
+        );
+        // submitBtn.click();
+        await sleepTime(0.4);
+        let sureBtn = doc.querySelector(
+          ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
+        );
+        sureBtn.click();
+        await sleepTime(1);
+        // alert("测试通过，模拟点击提交按钮");
+      } else {
+        console.log("未通过");
+      }
+      // 下一条
+      let nextBtns = doc.querySelectorAll(
+        ".pro-detail-head .el-button-group .el-button--primary"
       );
+      if (nextBtns.length === 0) {
+        return alert("未找到下一条按钮");
+      } else {
+        let nextBtn = nextBtns[1];
+        nextBtn.click();
+        // alert("点击下一条按钮");
+        await sleepTime(1);
+      }
     }
   }
 
