@@ -1,0 +1,7 @@
+POST https://xxcj.mnr.gov.cn/serApi/pegasus/tbCollect/flow/queryAuditPage HTTP/1.1
+content-type: application/json
+Authorization: e386719a-b87e-4eb8-bd45-027abcea3f75
+Connection: keep-alive
+
+
+{"pageNo":3,"pageSize":8000,"parameter":{"regions":[{"id":"150000","grade":1}],"text":"","reportStatus":"","checkStatus":"0","tbStatus":"0"}}

@@ -388,6 +388,7 @@
     for (let i = 0; i < idlist.length; i++) {
       const id = idlist[i];
       if (!running) {
+        breakid = id;
         break;
       }
       console.info("开始第" + i + "条数据", id);

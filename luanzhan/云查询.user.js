@@ -234,6 +234,27 @@
     if (location.hash != hash) {
       return alert("需进入云查询页面: https://landcloud.org.cn/" + hash);
     }
+    //监测面查询是否打开
+    let ds = document.querySelectorAll(
+      "#app .el-card__body .container .el-dialog__wrapper .el-dialog__title"
+    );
+    for (let i = 0; i < ds.length; i++) {
+      const card_title = ds[i];
+      if (card_title.innerText == "地块查询") {
+        if (card_title) {
+          if (
+            card_title.parentNode.parentNode.parentNode.style.display == "none"
+          ) {
+            // 需要点击面查询按钮
+            let m = document.querySelectorAll(".toolItem");
+            if (m?.length && m[0]) {
+              m[0].click();
+              await sleepSec(100);
+            }
+          }
+        }
+      }
+    }
 
     let idlist = getTextarea();
 
