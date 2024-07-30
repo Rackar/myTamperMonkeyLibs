@@ -9,9 +9,61 @@
 // @grant        none
 // ==/UserScript==
 
+//注意事项：由于有跨域，必须安装access-control-allow-origin插件，并打开快捷方式目标命令 --disable-web-security --user-data-dir=E:\IDE。
+
+//全部，筛选开关打开县级是否一致，市级是否一致，省级林草部门是否认定，审核阶段：省级
+
 (function () {
   "use strict";
+  let db;
+  let quitLoop = false;
   init();
+  openDb();
+  function openDb() {
+    let request = window.indexedDB.open("myDatabase", 1);
+    request.onsuccess = function (event) {
+      db = event.target.result;
+
+      console.log("数据库打开成功");
+    };
+    request.onerror = function (event) {
+      console.error(
+        "An error occurred while opening the database:",
+        event.target.errorCode
+      );
+    };
+    request.onupgradeneeded = function (event) {
+      db = event.target.result;
+
+      // Create or modify object stores here
+      const objectStore = db.createObjectStore("person", {
+        keyPath: "id",
+        autoIncrement: true,
+      });
+
+      objectStore.transaction.oncomplete = function (event) {
+        console.log("Object store created successfully!2");
+      };
+    };
+  }
+
+  function addRow(bsm) {
+    // console.log("数据待写入", bsm);
+    const transaction = db.transaction(["person"], "readwrite");
+    // transaction.oncomplete = function (event) {
+    //   console.log("事务完成，但无法确定是否成功创建了对象存储。");
+    // };
+    // transaction.onerror = function (event) {
+    //   console.log("事务失败。");
+    // };
+    const request = transaction.objectStore("person").add({ bsm });
+    // request.onsuccess = function (event) {
+    //   console.log("数据写入成功", bsm);
+    // };
+    // request.onerror = function (event) {
+    //   console.log("数据写入失败", event);
+    // };
+  }
 
   // Your code here...
   function sleepTime(secends) {
@@ -48,10 +100,27 @@
   }
 
   async function findConditionAndNext() {
-    if (true) {
-      let iframe = document.querySelector("iframe");
-      let doc = iframe.contentDocument;
+    let iframe = document.querySelector("iframe");
+    let doc = iframe.contentDocument;
+
+    let textbox = document.querySelector("#startPageIndex");
+
+    //获取分页大小和页码
+    let pagi = doc.querySelector(".customPager .el-select input");
+    let pNum = pagi.value.replace(/条\/页/, "");
+    let pageSize = (pNum && pNum - 0) || 20;
+    let pageIndex = (textbox.value && textbox.value - 0) || 1;
+    let index = 0;
+
+    while (!quitLoop) {
       let title = doc.querySelectorAll("form .comgroupparent"); //3个
+      if (title.length === 0) {
+        await sleepTime(3);
+        title = doc.querySelectorAll("form .comgroupparent"); //3个
+      }
+      let id = doc
+        .querySelector("div.el-tooltip.xmtitleCont")
+        .innerText.replace(/图斑编码：/, "");
 
       let divDiaochaXinxi = title[1];
       let subDiaocha = divDiaochaXinxi.querySelectorAll(".el-form-item"); //48个
@@ -71,9 +140,9 @@
           if (option) {
             let text = option.innerText;
             if (text === "认定2023年“一上”成果") allow++;
-            console.log(label + "：" + text, allow);
+            // console.log(label + "：" + text, allow);
           } else {
-            console.log(label + "： 未找到");
+            // console.log(label + "： 未找到");
           }
         } else if (
           label == "市级林草部门是否认定县级核实结论" ||
@@ -86,35 +155,37 @@
           if (radio) {
             let text = radio.innerText;
             if (text.trim() === "是") allow++;
-            console.log(label + "：" + text, allow);
+            // console.log(label + "：" + text, allow);
           } else {
-            console.log(label + "： 未找到");
+            // console.log(label + "： 未找到");
           }
         } else if (label == "省级调查部门是否认定县级核实结论") {
           shengji = value.querySelector("label.el-radio");
         }
       }
       if (allow === 5) {
-        console.log("通过,点击按钮");
+        // console.log("通过,点击按钮");
         shengji.click();
-        await sleepTime(0.2);
+        await sleepTime(0.3);
         let divShenheTuban = title[2];
         let passRadio = divShenheTuban.querySelector("label.el-radio");
         passRadio.click();
-        await sleepTime(0.2);
+        await sleepTime(0.3);
         let submitBtn = divShenheTuban.querySelector(
           "button.el-button.el-button--success"
         );
-        // submitBtn.click();
-        await sleepTime(0.4);
+        submitBtn.click();
+        await sleepTime(1.4);
         let sureBtn = doc.querySelector(
           ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
         );
         sureBtn.click();
-        await sleepTime(1);
+        await sleepTime(1.3);
+        addRow(id);
         // alert("测试通过，模拟点击提交按钮");
       } else {
-        console.log("未通过");
+        // console.log("未通过");
+        await sleepTime(0.3);
       }
       // 下一条
       let nextBtns = doc.querySelectorAll(
@@ -126,7 +197,14 @@
         let nextBtn = nextBtns[1];
         nextBtn.click();
         // alert("点击下一条按钮");
-        await sleepTime(1);
+        index++;
+        textbox.value = pageIndex + Math.floor(index / pageSize);
+
+        localStorage.setItem("pageIndex", textbox.value);
+        localStorage.setItem("index", index);
+        localStorage.setItem("pageSize", pageSize);
+
+        await sleepTime(1.5);
       }
     }
   }
@@ -140,13 +218,52 @@
     ) {
       return alert("需进入国土云林草审核专项");
     }
+    jumpStartPage();
+    clickDetail();
+
+    quitLoop = false;
+
     findConditionAndNext();
+  }
+  async function clickDetail() {
+    let iframe = document.querySelector("iframe");
+    let doc = iframe.contentDocument;
+    let detail = doc.querySelector(".list_table .el-table__row button");
+    detail.click();
+    await sleepTime(1.5);
+  }
+
+  async function jumpStartPage() {
+    let textbox = document.querySelector("#startPageIndex");
+    let iframe = document.querySelector("iframe");
+    let doc = iframe.contentDocument;
+    let pagi = doc.querySelector(".customPager");
+    let pageNum = pagi.querySelector(".el-input-number input");
+
+    if (!textbox.value || textbox.value == pageNum.value) {
+      return true;
+    } else {
+      pageNum.value = textbox.value;
+      // pageNum.dispatchEvent(new Event("input"));
+
+      setTimeout(() => {
+        // 给input标签触发回车键事件
+        // pageNum.focus();
+        // pageNum.click();
+        pageNum.dispatchEvent(new Event("change")); //element input 监听回车只需要发送change事件触发
+        // pageNum.dispatchEvent(new Event("keydown", { KeyCode: 13 }));
+      }, 50);
+
+      await sleepTime(2);
+
+      return false;
+    }
   }
 
   function addUI() {
-    var css =
+    const css =
       "button.hoverbtn:hover{ background-color: #b3cbff }button.passbtn{background-color:#edffed}button.refusebtn{background-color:#e8806b}";
-    var style = document.createElement("style");
+    const style = document.createElement("style");
 
     if (style.styleSheet) {
       style.styleSheet.cssText = css;
@@ -156,7 +273,7 @@
 
     document.getElementsByTagName("head")[0].appendChild(style);
     // 创建一个包装div
-    var containerDiv = document.createElement("div");
+    const containerDiv = document.createElement("div");
     containerDiv.style.position = "absolute";
     containerDiv.style.zIndex = "9999";
     containerDiv.style.backgroundColor = "#fff";
@@ -168,12 +285,13 @@
     containerDiv.style.backgroundColor = "#efefef";
     containerDiv.style.cursor = "move";
     containerDiv.style.overflowWrap = "anywhere";
-    containerDiv.style.left = "10px";
-    containerDiv.style.top = "410px";
+    containerDiv.style.left = "4px";
+    containerDiv.style.top = "350px";
+    containerDiv.style.fontSize = "14px";
     document.body.appendChild(containerDiv);
 
     // 创建关闭按钮
-    var closeButton = document.createElement("button");
+    const closeButton = document.createElement("button");
     closeButton.innerHTML = "&times;"; // 使用HTML实体表示关闭图标
     closeButton.style.position = "absolute";
     closeButton.style.top = "5px"; // 调整距离顶部的距离
@@ -182,6 +300,7 @@
     closeButton.style.border = "none";
     closeButton.style.color = "#fff";
     // closeButton.style.padding = "2px 5px";
+    closeButton.style.width = "15px";
     closeButton.style.cursor = "pointer";
     closeButton.style.borderRadius = "50%"; // 使按钮呈圆形
     closeButton.title = "关闭后需刷新页面重新打开"; // 添加title属性
@@ -208,23 +327,51 @@
     // // textarea.style.resize = "both"; // 允许调整大小
     // containerDiv.appendChild(textarea);
 
+    // 创建可拖动的textarea元素
+    const startPageIndexLabel = document.createElement("span");
+    startPageIndexLabel.id = "startPageIndexLabel";
+    startPageIndexLabel.innerText = "起始页码：";
+    // startPageIndex.style.width = "80px";
+    // textarea.style.resize = "both"; // 允许调整大小
+    containerDiv.appendChild(startPageIndexLabel);
+
+    const startPageIndex = document.createElement("input");
+    startPageIndex.id = "startPageIndex";
+    startPageIndex.style.width = "100px";
+    // textarea.style.resize = "both"; // 允许调整大小
+    containerDiv.appendChild(startPageIndex);
+
     // 创建开始执行按钮
-    var startButton = document.createElement("button");
+    const startButton = document.createElement("button");
     startButton.id = "executeButton";
-    startButton.innerHTML = "开始";
+    startButton.innerHTML = "开始批量提交";
     startButton.style.marginTop = "10px";
     containerDiv.appendChild(startButton);
 
     // 绑定按钮点击事件
     startButton.addEventListener("click", readTextareaContent);
 
+    // 创建开始执行按钮
+    const stopButton = document.createElement("button");
+    stopButton.id = "stopButton";
+    stopButton.innerHTML = "停止";
+    stopButton.style.marginTop = "10px";
+    containerDiv.appendChild(stopButton);
+
+    // 绑定按钮点击事件
+    stopButton.addEventListener("click", () => {
+      quitLoop = true;
+    });
+
+    let pageIndex = localStorage.getItem("pageIndex");
+    if (pageIndex) startPageIndex.value = pageIndex;
     //textarea.focus();
 
     //#endregion
 
     // 使元素可拖动的函数
     function makeElementDraggable(element) {
-      var pos1 = 0,
+      let pos1 = 0,
         pos2 = 0,
         pos3 = 0,
         pos4 = 0;
