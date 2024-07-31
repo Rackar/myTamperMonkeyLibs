@@ -4,6 +4,7 @@
 // @description  国土云林草专项1-5符合的自动通过
 // @author       rackar
 // @match        https://landcloud.org.cn/*
+// @match        https://www.landcloud.org.cn/*
 // @match        https://jg.landcloud.org.cn:5443/main/list/lddjzxdk/1/xftbsj
 // @require      https://cdn.bootcss.com/jquery/2.2.1/jquery.js
 // @grant        none
@@ -47,7 +48,7 @@
     };
   }
 
-  function addRow(bsm) {
+  function addRow(bsm, tongguo = 1) {
     // console.log("数据待写入", bsm);
     const transaction = db.transaction(["person"], "readwrite");
     // transaction.oncomplete = function (event) {
@@ -56,7 +57,7 @@
     // transaction.onerror = function (event) {
     //   console.log("事务失败。");
     // };
-    const request = transaction.objectStore("person").add({ bsm });
+    const request = transaction.objectStore("person").add({ bsm, tongguo });
     // request.onsuccess = function (event) {
     //   console.log("数据写入成功", bsm);
     // };
@@ -163,8 +164,11 @@
           shengji = value.querySelector("label.el-radio");
         }
       }
-      if (allow === 5) {
-        // console.log("通过,点击按钮");
+      let checkedSkip = document.querySelector("#skipCheckbox").checked;
+      //检测skipCheckbox是否选中,选中则直接提交
+
+      if (allow === 5 || checkedSkip) {
+        // console.log("上报");
         shengji.click();
         await sleepTime(0.3);
         let divShenheTuban = title[2];
@@ -181,10 +185,11 @@
         );
         sureBtn.click();
         await sleepTime(1.3);
-        addRow(id);
+        addRow(id, 1);
         // alert("测试通过，模拟点击提交按钮");
       } else {
         // console.log("未通过");
+        addRow(id, -1);
         await sleepTime(0.3);
       }
       // 下一条
@@ -319,13 +324,24 @@
 
     //#region 创建可拖动的textarea元素
 
-    // 创建可拖动的textarea元素
-    // var textarea = document.createElement("textarea");
-    // textarea.id = "customTextarea";
-    // textarea.style.width = "300px";
-    // textarea.style.height = "100px";
-    // // textarea.style.resize = "both"; // 允许调整大小
-    // containerDiv.appendChild(textarea);
+    //创建一个div容器
+    var subContainer = document.createElement("div");
+    subContainer.style.paddingBottom = "4px";
+
+    containerDiv.appendChild(subContainer);
+
+    //创建一个复选框，可以选择是否跳过监测
+    var checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = "skipCheckbox";
+    checkbox.style.marginRight = "4px";
+    subContainer.appendChild(checkbox);
+    //复选框后加一个label绑定
+    var checkboxLabel = document.createElement("label");
+    checkboxLabel.htmlFor = "skipCheckbox";
+    checkboxLabel.textContent = "勾选后跳过检测";
+    subContainer.appendChild(checkboxLabel);
+    //#endregion
 
     // 创建可拖动的textarea元素
     const startPageIndexLabel = document.createElement("span");
