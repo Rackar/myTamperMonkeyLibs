@@ -127,10 +127,13 @@
       let subDiaocha = divDiaochaXinxi.querySelectorAll(".el-form-item"); //48个
       let shengji = null;
       let allow = 0;
-      for (let i = 0; i < subDiaocha.length; i++) {
-        const item = subDiaocha[i];
-        let label = item.children[0].innerText;
-        let value = item.children[1];
+
+      let arr = [];
+      // 一个布尔值标记出是否所有列都符合条件
+      let checkAllOK = true;
+      for (const e of subDiaocha) {
+        let label = e.children[0].innerText;
+        let value = e.children[1];
         if (
           label == "县级林草部门地类认定结果" ||
           label == "县级调查部门地类认定结果"
@@ -140,10 +143,13 @@
           );
           if (option) {
             let text = option.innerText;
-            if (text === "认定2023年“一上”成果") allow++;
-            // console.log(label + "：" + text, allow);
-          } else {
-            // console.log(label + "： 未找到");
+            value = text;
+            arr.push({ label, value });
+            if (text === "认定2023年“一上”成果") {
+              // value =
+            } else {
+              checkAllOK = false;
+            }
           }
         } else if (
           label == "市级林草部门是否认定县级核实结论" ||
@@ -155,19 +161,23 @@
           );
           if (radio) {
             let text = radio.innerText;
-            if (text.trim() === "是") allow++;
-            // console.log(label + "：" + text, allow);
-          } else {
-            // console.log(label + "： 未找到");
+            value = text;
+            arr.push({ label, value });
+            if (text.trim() === "是") {
+              //
+            } else {
+              checkAllOK = false;
+            }
           }
         } else if (label == "省级调查部门是否认定县级核实结论") {
           shengji = value.querySelector("label.el-radio");
         }
       }
+
       let checkedSkip = document.querySelector("#skipCheckbox").checked;
       //检测skipCheckbox是否选中,选中则直接提交
 
-      if (allow === 5 || checkedSkip) {
+      if (checkAllOK || checkedSkip) {
         // console.log("上报");
         shengji.click();
         await sleepTime(0.3);
@@ -330,7 +340,7 @@
 
     containerDiv.appendChild(subContainer);
 
-    //创建一个复选框，可以选择是否跳过监测
+    //创建一个复选框，可以选择是否跳过检测
     var checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.id = "skipCheckbox";
