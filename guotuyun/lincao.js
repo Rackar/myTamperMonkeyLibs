@@ -13,6 +13,7 @@
 //注意事项：由于有跨域，必须安装access-control-allow-origin插件，并打开快捷方式目标命令 --disable-web-security --user-data-dir=E:\IDE。
 
 //全部，筛选开关打开县级是否一致，市级是否一致，省级林草部门是否认定，审核阶段：省级
+// 注意国土云有很多display:none;的元素，需要甄别后再获取操作。如获取到了非所需标签，指向打印结果时不会在页面上高亮
 
 (function () {
   "use strict";
@@ -100,7 +101,7 @@
     // });
   }
 
-  async function findConditionAndNext() {
+  async function findConditionAndNext(passOrRefuse = true) {
     let iframe = document.querySelector("iframe");
     let doc = iframe.contentDocument;
 
@@ -126,11 +127,17 @@
       let divDiaochaXinxi = title[1];
       let subDiaocha = divDiaochaXinxi.querySelectorAll(".el-form-item"); //48个
       let shengji = null;
+      let shengjiOption = [];
+      let shengjiInput = null;
       let allow = 0;
 
       let arr = [];
+      //检测skipCheckbox是否选中,选中则直接提交
+      let checkedSkip = document.querySelector("#skipCheckbox").checked;
+
       // 一个布尔值标记出是否所有列都符合条件
       let checkAllOK = true;
+
       for (const e of subDiaocha) {
         let label = e.children[0].innerText;
         let value = e.children[1];
@@ -170,33 +177,84 @@
             }
           }
         } else if (label == "省级调查部门是否认定县级核实结论") {
-          shengji = value.querySelector("label.el-radio");
+          shengji = value.querySelectorAll("label.el-radio");
+        } else if (label == "省级调查部门地类认定结果") {
+          shengjiOption.push(value.querySelector(".el-select"));
+        } else if (label == "省级调查部门情况说明") {
+          if (e.style && e.style.display == "none") {
+          } else {
+            shengjiInput = e.querySelector("input");
+          }
         }
       }
 
-      let checkedSkip = document.querySelector("#skipCheckbox").checked;
-      //检测skipCheckbox是否选中,选中则直接提交
-
       if (checkAllOK || checkedSkip) {
         // console.log("上报");
-        shengji.click();
-        await sleepTime(0.3);
-        let divShenheTuban = title[2];
-        let passRadio = divShenheTuban.querySelector("label.el-radio");
-        passRadio.click();
-        await sleepTime(0.3);
-        let submitBtn = divShenheTuban.querySelector(
-          "button.el-button.el-button--success"
-        );
-        submitBtn.click();
-        await sleepTime(1.4);
-        let sureBtn = doc.querySelector(
-          ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
-        );
-        sureBtn.click();
-        await sleepTime(1.3);
-        addRow(id, 1);
-        // alert("测试通过，模拟点击提交按钮");
+
+        // 是不通过还是通过的情况
+        if (!passOrRefuse) {
+          // 不通过
+          // 点否
+          shengji[1].click();
+          await sleepTime(0.5);
+          // 多选“不认定”，双重选项，已搞定
+          shengjiOption[0].click();
+          await sleepTime(0.3);
+
+          let list = doc.querySelectorAll(
+            "body>.el-select-dropdown .el-select-dropdown__list li.el-select-dropdown__item"
+          );
+          for (const xx of list) {
+            if (xx.innerText === "不认定") {
+              xx.click();
+              xx.dispatchEvent(new Event("change"));
+              shengjiOption[0].dispatchEvent(new Event("change"));
+            }
+          }
+
+          // 添加需认定至二级类
+          shengjiInput.value = "需认定至二级类";
+          shengjiInput.dispatchEvent(new Event("change"));
+
+          let divShenheTuban = title[2];
+          // 不通过按钮
+          let passRadio = divShenheTuban.querySelectorAll("label.el-radio")[1];
+          passRadio.click();
+          await sleepTime(0.3);
+          // 退回修改
+          let submitBtn = divShenheTuban.querySelector(
+            "button.el-button.style-button-clarebtn"
+          );
+          submitBtn.click();
+          await sleepTime(1.4);
+          let sureBtn = doc.querySelector(
+            ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
+          );
+          sureBtn.click();
+          await sleepTime(1.3);
+          addRow(id, 1);
+          // alert("测试通过，模拟点击提交按钮");
+        } else {
+          // 通过
+          shengji[0].click();
+          await sleepTime(0.3);
+          let divShenheTuban = title[2];
+          let passRadio = divShenheTuban.querySelector("label.el-radio");
+          passRadio.click();
+          await sleepTime(0.3);
+          let submitBtn = divShenheTuban.querySelector(
+            "button.el-button.el-button--success"
+          );
+          submitBtn.click();
+          await sleepTime(1.4);
+          let sureBtn = doc.querySelector(
+            ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
+          );
+          sureBtn.click();
+          await sleepTime(1.3);
+          addRow(id, 1);
+          // alert("测试通过，模拟点击提交按钮");
+        }
       } else {
         // console.log("未通过");
         addRow(id, -1);
@@ -238,8 +296,26 @@
 
     quitLoop = false;
 
-    findConditionAndNext();
+    findConditionAndNext(true);
   }
+
+  async function readTextareaContentAndRefuse() {
+    if (
+      !(
+        location.hash.indexOf("#/specialMission") > -1 &&
+        new Date().getFullYear() === 2024
+      )
+    ) {
+      return alert("需进入国土云林草审核专项");
+    }
+    jumpStartPage();
+    clickDetail();
+
+    quitLoop = false;
+
+    findConditionAndNext(false);
+  }
+
   async function clickDetail() {
     let iframe = document.querySelector("iframe");
     let doc = iframe.contentDocument;
@@ -374,8 +450,16 @@
     startButton.style.marginTop = "10px";
     containerDiv.appendChild(startButton);
 
+    // 创建开始执行按钮
+    const refuseButton = document.createElement("button");
+    refuseButton.id = "refuseButton";
+    refuseButton.innerHTML = "开始批量退回";
+    refuseButton.style.marginTop = "10px";
+    containerDiv.appendChild(refuseButton);
+
     // 绑定按钮点击事件
     startButton.addEventListener("click", readTextareaContent);
+    refuseButton.addEventListener("click", readTextareaContentAndRefuse);
 
     // 创建开始执行按钮
     const stopButton = document.createElement("button");
