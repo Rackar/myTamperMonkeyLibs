@@ -183,6 +183,7 @@
         } else if (label == "省级调查部门情况说明") {
           if (e.style && e.style.display == "none") {
           } else {
+            // console.log(e);
             shengjiInput = e.querySelector("input");
           }
         }
@@ -193,11 +194,16 @@
 
         // 是不通过还是通过的情况
         if (!passOrRefuse) {
-          // 不通过
+          // 滚动到底部
+          let scrollContainer = doc.querySelector(".info.ComponentBOX");
+          scrollContainer.scroll({
+            top: 2800,
+            behavior: "smooth", // 可选，平滑滚动
+          });
           // 点否
           shengji[1].click();
           await sleepTime(0.5);
-          // 多选“不认定”，双重选项，已搞定
+          // 多选“不认定”
           shengjiOption[0].click();
           await sleepTime(0.3);
 
@@ -211,10 +217,27 @@
               shengjiOption[0].dispatchEvent(new Event("change"));
             }
           }
-
-          // 添加需认定至二级类
-          shengjiInput.value = "需认定至二级类";
-          shengjiInput.dispatchEvent(new Event("change"));
+          await sleepTime(0.3);
+          const QingKuangShuoMing = "需认定至二级类";
+          if (!shengjiInput) {
+            let all = doc.querySelectorAll(
+              "form .comgroupparent .el-form-item label"
+            );
+            for (const label of all) {
+              let text = label.innerText.trim();
+              if (text == "省级调查部门情况说明") {
+                console.log(label);
+                let p = label.parentElement;
+                shengjiInput = p.querySelector("input");
+                shengjiInput.value = QingKuangShuoMing;
+                shengjiInput.dispatchEvent(new Event("change"));
+              }
+            }
+          } else {
+            shengjiInput.value = QingKuangShuoMing;
+            shengjiInput.dispatchEvent(new Event("change"));
+          }
+          await sleepTime(0.3);
 
           let divShenheTuban = title[2];
           // 不通过按钮
@@ -256,7 +279,7 @@
           // alert("测试通过，模拟点击提交按钮");
         }
       } else {
-        // console.log("未通过");
+        // console.log("检测条件为不符");
         addRow(id, -1);
         await sleepTime(0.3);
       }
@@ -277,7 +300,7 @@
         localStorage.setItem("index", index);
         localStorage.setItem("pageSize", pageSize);
 
-        await sleepTime(1.5);
+        await sleepTime(2);
       }
     }
   }
@@ -321,7 +344,7 @@
     let doc = iframe.contentDocument;
     let detail = doc.querySelector(".list_table .el-table__row button");
     detail.click();
-    await sleepTime(1.5);
+    await sleepTime(2.5);
   }
 
   async function jumpStartPage() {
