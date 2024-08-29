@@ -16,7 +16,9 @@
 // 注意国土云有很多display:none;的元素，需要甄别后再获取操作。如获取到了非所需标签，指向打印结果时不会在页面上高亮
 
 (function () {
-  "use strict";
+  ("use strict");
+  // const TEST_MODE = false; // 使用时将测试模式关闭
+  const TEST_MODE = true; // 调试时将测试模式打开
   let db;
   let quitLoop = false;
   init();
@@ -202,7 +204,7 @@
           });
           // 点否
           shengji[1].click();
-          await sleepTime(0.5);
+          await sleepTime(1);
           // 多选“不认定”
           shengjiOption[0].click();
           await sleepTime(0.3);
@@ -219,44 +221,52 @@
           }
           await sleepTime(0.3);
           const QingKuangShuoMing = "需认定至二级类";
-          if (!shengjiInput) {
-            let all = doc.querySelectorAll(
-              "form .comgroupparent .el-form-item label"
-            );
-            for (const label of all) {
-              let text = label.innerText.trim();
-              if (text == "省级调查部门情况说明") {
-                console.log(label);
-                let p = label.parentElement;
-                shengjiInput = p.querySelector("input");
-                shengjiInput.value = QingKuangShuoMing;
-                shengjiInput.dispatchEvent(new Event("change"));
-              }
+
+          let all = doc.querySelectorAll(
+            "form .comgroupparent .el-form-item label"
+          );
+          for (const label of all) {
+            let text = label.innerText.trim();
+            if (text == "省级调查部门情况说明") {
+              console.log(label);
+              let p = label.parentElement;
+              shengjiInput = p.querySelector("input");
+              shengjiInput.value = QingKuangShuoMing;
+              shengjiInput.dispatchEvent(new Event("input"));
+              shengjiInput.dispatchEvent(new Event("change"));
             }
-          } else {
-            shengjiInput.value = QingKuangShuoMing;
-            shengjiInput.dispatchEvent(new Event("change"));
           }
+
           await sleepTime(0.3);
 
           let divShenheTuban = title[2];
           // 不通过按钮
+          if (!divDiaochaXinxi) {
+            return alert("页面错误，未找到操作按钮");
+          }
           let passRadio = divShenheTuban.querySelectorAll("label.el-radio")[1];
           passRadio.click();
-          await sleepTime(0.3);
-          // 退回修改
-          let submitBtn = divShenheTuban.querySelector(
-            "button.el-button.style-button-clarebtn"
-          );
-          submitBtn.click();
-          await sleepTime(1.4);
-          let sureBtn = doc.querySelector(
-            ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
-          );
-          sureBtn.click();
-          await sleepTime(1.3);
-          addRow(id, 1);
-          // alert("测试通过，模拟点击提交按钮");
+          await sleepTime(0.6);
+
+          if (TEST_MODE) {
+            return alert("测试通过，模拟点击提交按钮");
+          } else {
+            // 退回修改
+            let submitBtn = divShenheTuban.querySelector(
+              "button.el-button.style-button-clarebtn"
+            );
+            submitBtn.click();
+            await sleepTime(1.0);
+            let sureBtn = doc.querySelector(
+              ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
+            );
+            sureBtn.click();
+            await sleepTime(1.3);
+            addRow(id, 1);
+          }
+
+          // https://jg.landcloud.org.cn:8553/webapi/zxjg/addorupdateywdata
+          // 提交请求的地址为
         } else {
           // 通过
           shengji[0].click();
@@ -265,17 +275,21 @@
           let passRadio = divShenheTuban.querySelector("label.el-radio");
           passRadio.click();
           await sleepTime(0.3);
-          let submitBtn = divShenheTuban.querySelector(
-            "button.el-button.el-button--success"
-          );
-          submitBtn.click();
-          await sleepTime(1.4);
-          let sureBtn = doc.querySelector(
-            ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
-          );
-          sureBtn.click();
-          await sleepTime(1.3);
-          addRow(id, 1);
+          if (TEST_MODE) {
+            return alert("测试通过，模拟点击提交按钮");
+          } else {
+            let submitBtn = divShenheTuban.querySelector(
+              "button.el-button.el-button--success"
+            );
+            submitBtn.click();
+            await sleepTime(1.4);
+            let sureBtn = doc.querySelector(
+              ".el-message-box__wrapper .el-message-box__btns .el-button--small.el-button--primary"
+            );
+            sureBtn.click();
+            await sleepTime(1.3);
+            addRow(id, 1);
+          }
           // alert("测试通过，模拟点击提交按钮");
         }
       } else {
