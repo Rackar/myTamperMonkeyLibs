@@ -17,8 +17,8 @@
 
 (function () {
   ("use strict");
-  // const TEST_MODE = false; // 使用时将测试模式关闭
-  const TEST_MODE = true; // 调试时将测试模式打开
+  const TEST_MODE = false; // 使用时将测试模式关闭
+  // const TEST_MODE = true; // 调试时将测试模式打开
   let db;
   let quitLoop = false;
   init();
@@ -117,6 +117,7 @@
     let index = 0;
 
     while (!quitLoop) {
+      sleepTime(0.5);
       let title = doc.querySelectorAll("form .comgroupparent"); //3个
       if (title.length === 0) {
         await sleepTime(3);
@@ -144,8 +145,8 @@
         let label = e.children[0].innerText;
         let value = e.children[1];
         if (
-          label == "县级林草部门地类认定结果" ||
-          label == "县级调查部门地类认定结果"
+          label == "县级林草部门地类认定类型" ||
+          label == "县级自然资源部门地类认定类型"
         ) {
           let option = value.querySelector(
             "li.el-select-dropdown__item.selected"
@@ -162,7 +163,7 @@
           }
         } else if (
           label == "市级林草部门是否认定县级核实结论" ||
-          label == "市级调查部门是否认定县级核实结论" ||
+          label == "市级自然资源部门是否认定县级核实结论" ||
           label == "省级林草部门是否认定县级核实结论"
         ) {
           let radio = value.querySelector(
@@ -178,11 +179,11 @@
               checkAllOK = false;
             }
           }
-        } else if (label == "省级调查部门是否认定县级核实结论") {
+        } else if (label == "省级自然资源部门是否认定县级核实结论") {
           shengji = value.querySelectorAll("label.el-radio");
-        } else if (label == "省级调查部门地类认定结果") {
+        } else if (label == "省级自然资源部门地类认定结果") {
           shengjiOption.push(value.querySelector(".el-select"));
-        } else if (label == "省级调查部门情况说明") {
+        } else if (label == "省级自然资源部门情况说明") {
           if (e.style && e.style.display == "none") {
           } else {
             // console.log(e);
@@ -192,16 +193,16 @@
       }
 
       if (checkAllOK || checkedSkip) {
-        // console.log("上报");
+        // 滚动到底部
+        let scrollContainer = doc.querySelector(".info.ComponentBOX");
+        scrollContainer.scroll({
+          top: 2800,
+          behavior: "smooth", // 可选，平滑滚动
+        });
+        await sleepTime(0.5);
 
         // 是不通过还是通过的情况
         if (!passOrRefuse) {
-          // 滚动到底部
-          let scrollContainer = doc.querySelector(".info.ComponentBOX");
-          scrollContainer.scroll({
-            top: 2800,
-            behavior: "smooth", // 可选，平滑滚动
-          });
           // 点否
           shengji[1].click();
           await sleepTime(1);
@@ -227,7 +228,7 @@
           );
           for (const label of all) {
             let text = label.innerText.trim();
-            if (text == "省级调查部门情况说明") {
+            if (text == "省级自然资源部门情况说明") {
               console.log(label);
               let p = label.parentElement;
               shengjiInput = p.querySelector("input");
@@ -328,12 +329,12 @@
     ) {
       return alert("需进入国土云林草审核专项");
     }
-    jumpStartPage();
-    clickDetail();
+    await jumpStartPage();
+    await clickDetail();
 
     quitLoop = false;
 
-    findConditionAndNext(true);
+    await findConditionAndNext(true);
   }
 
   async function readTextareaContentAndRefuse() {
@@ -345,12 +346,12 @@
     ) {
       return alert("需进入国土云林草审核专项");
     }
-    jumpStartPage();
-    clickDetail();
+    await jumpStartPage();
+    await clickDetail();
 
     quitLoop = false;
 
-    findConditionAndNext(false);
+    await findConditionAndNext(false);
   }
 
   async function clickDetail() {
