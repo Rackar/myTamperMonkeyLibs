@@ -8,11 +8,12 @@
 // @grant        none
 // ==/UserScript==
 
-(function () {
+(async function () {
   ("use strict");
-  const API_ADDRESS = "https://nmgwxyy.cn/alatan/yangxut/noauth/nmgty"; //正式地址
-
-  // const API_ADDRESS = "https://nmgwxyy.cn/alatan/yangxuweb/noauth/nmgty"; // 调试地址
+  const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t正式地址 pm2启用
+  // const HOST = "https://nmgwxyy.cn/alatan/yangxuweb/noauth/"; // web调试地址
+  const API_ADDRESS = HOST + "nmgty"; //
+  const DICT_ADDRESS = HOST + "nmgty/dict";
 
   hideUI();
   addUI();
@@ -31,7 +32,7 @@
     }, 1000);
   }
 
-  function addUI() {
+  async function addUI() {
     var css =
       "button.hoverbtn:hover{ background-color: #b3cbff }button.passbtn{background-color:#edffed}button.refusebtn{background-color:#e8806b}";
     var style = document.createElement("style");
@@ -95,47 +96,57 @@
     passContainer.style.marginTop = "20px";
     passContainer.style.cursor = "default";
     passContainer.style.backgroundColor = "#e6e6e6";
-    passContainer.id = "myPassPanel";
+    passContainer.id = "myPassCheckbox";
     containerDiv.appendChild(passContainer); // 将容器添加到页面中
 
-    var optionsPass = [
-      { text: "批供手续齐全" },
-      {
-        text: "有实地照片",
+    // 拉取数据字典
+    let dict_data = await fetch(DICT_ADDRESS, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json;charset=utf-8",
       },
-      { text: "只有农转用" },
-      { text: "只有供地" },
-      { text: "设施农符合用途" },
-      { text: "临时用地复合用途" },
-      { text: "其他权证合法" },
-      { text: "大棚及种植设施" },
-      { text: "203范围内" },
-      { text: "宅基地" },
-      { text: "推填土" },
-      { text: "非卫片关心变化" },
-      { text: "伪图斑提取错误" },
-      { text: "有瑕疵" },
-      { text: "采矿用地" },
-      {
-        text: "大面积工程建设",
-      },
-    ];
-    for (let i = 0; i < optionsPass.length; i++) {
-      optionsPass[i].value = optionsPass[i].text;
-    }
+    }).then((response) => response.json());
+
+    console.log(dict_data);
+    const optionsPass =
+      dict_data?.data?.filter((el) => el.type == "通过") || [];
+    const options = dict_data?.data?.filter((el) => el.type == "不通过") || [];
+    // var optionsPass = [
+    //   { text: "批供手续齐全" },
+    //   {
+    //     text: "有实地照片",
+    //   },
+    //   { text: "只有农转用" },
+    //   { text: "只有供地" },
+    //   { text: "设施农符合用途" },
+    //   { text: "临时用地复合用途" },
+    //   { text: "其他权证合法" },
+    //   { text: "大棚及种植设施" },
+    //   { text: "203范围内" },
+    //   { text: "宅基地" },
+    //   { text: "推填土" },
+    //   { text: "非卫片关心变化" },
+    //   { text: "伪图斑提取错误" },
+    //   { text: "有瑕疵" },
+    //   { text: "采矿用地" },
+    //   {
+    //     text: "大面积工程建设",
+    //   },
+    // ];
+    // for (let i = 0; i < optionsPass.length; i++) {
+    //   optionsPass[i].value = optionsPass[i].text;
+    // }
 
     // 用于存储当前选中的值
     var selectedValue = "";
 
-    var passContainer = document.createElement("div"); // 创建一个容器来存放所有的选择框
-    passContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
-    passContainer.style.flexWrap = "wrap"; // 允许换行
-    passContainer.style.justifyContent = "center"; // 水平居中
-    passContainer.style.marginTop = "20px";
-    passContainer.style.cursor = "default";
-    passContainer.style.backgroundColor = "#e6e6e6";
-    passContainer.id = "myPassCheckbox";
-    containerDiv.appendChild(passContainer); // 将容器添加到页面中
+    var passContainer2 = document.createElement("div"); // 创建一个容器来存放按钮
+    passContainer2.style.display = "block"; // 改变布局方式以便更好地排列复选框
+    passContainer2.style.flexWrap = "wrap"; // 允许换行
+    passContainer2.style.justifyContent = "center"; // 水平居中
+    passContainer2.style.cursor = "default";
+    passContainer2.id = "myPassPanel";
+    containerDiv.appendChild(passContainer2); // 将容器添加到页面中
 
     // #region 多选退回理由模块
     // 动态创建多个复选框
@@ -152,7 +163,8 @@
       var label = document.createElement("label");
       label.htmlFor = checkbox.id; // 关联label和checkbox
       label.style.marginLeft = "2px";
-      label.appendChild(document.createTextNode(optionText.text)); // 在label中添加文本
+      label.style.userSelect = "none";
+      label.appendChild(document.createTextNode(optionText.name)); // 在label中添加文本
 
       div.appendChild(checkbox); // 将复选框添加到容器中
       div.appendChild(label); // 将label添加到容器中
@@ -162,13 +174,13 @@
     // 创建单次通过按钮
     var singleButton = document.createElement("button");
     singleButton.id = "singleButton";
-    singleButton.innerHTML = "√ 单次通过（需先进入查看详情页）";
+    singleButton.innerHTML = "通过（多选）";
     singleButton.style.marginTop = "10px";
     singleButton.style.cursor = "pointer";
     //  singleButton.style.backgroundColor = "#edffed";
     singleButton.classList.add("hoverbtn");
     singleButton.classList.add("passbtn");
-    containerDiv.appendChild(singleButton);
+    passContainer2.appendChild(singleButton);
     singleButton.addEventListener("click", clickSaveBtn);
 
     var singleClearButton1 = document.createElement("button");
@@ -179,30 +191,30 @@
     singleClearButton1.style.marginTop = "5px";
     singleClearButton1.style.marginLeft = "10px";
 
-    containerDiv.appendChild(singleClearButton1);
+    passContainer2.appendChild(singleClearButton1);
     singleClearButton1.addEventListener("click", uncheckAllBox);
 
     //#endregion
 
     // 创建多选框组
-    var options = [
-      "需补充农转用批地手续",
-      "需补充供地手续",
-      "需补充实地照片",
-      "需补充内部照片",
-      "需提供套合图",
-      "举证材料非属于本图斑",
-      "材料中的位置、面积或图斑号不符",
+    // var options = [
+    //   "需补充农转用批地手续",
+    //   "需补充供地手续",
+    //   "需补充实地照片",
+    //   "需补充内部照片",
+    //   "需提供套合图",
+    //   "举证材料非属于本图斑",
+    //   "材料中的位置、面积或图斑号不符",
 
-      "应判定为违法",
-      "设施农不得占耕",
-      "临时用地禁止永久建筑",
-      "有弄虚作假嫌疑",
+    //   "应判定为违法",
+    //   "设施农不得占耕",
+    //   "临时用地禁止永久建筑",
+    //   "有弄虚作假嫌疑",
 
-      "采矿用地",
-      "大面积工程建设",
-      "明显已动工，非推土",
-    ];
+    //   "采矿用地",
+    //   "大面积工程建设",
+    //   "明显已动工，非推土",
+    // ];
     var refuseContainer2 = document.createElement("div"); // 创建一个容器来存放所有的选择框
     refuseContainer2.style.display = "block"; // 改变布局方式以便更好地排列复选框
     refuseContainer2.style.flexWrap = "wrap"; // 允许换行
@@ -228,7 +240,8 @@
       var label = document.createElement("label");
       label.htmlFor = checkbox.id; // 关联label和checkbox
       label.style.marginLeft = "2px";
-      label.appendChild(document.createTextNode(optionText)); // 在label中添加文本
+      label.style.userSelect = "none";
+      label.appendChild(document.createTextNode(optionText.name)); // 在label中添加文本
 
       div.appendChild(checkbox); // 将复选框添加到容器中
       div.appendChild(label); // 将label添加到容器中
@@ -240,7 +253,7 @@
     // 创建单次不通过按钮
     var singleRefuseButton = document.createElement("button");
     singleRefuseButton.id = "singleRefuseButton";
-    singleRefuseButton.innerHTML = "× 单次不通过（需多选理由）";
+    singleRefuseButton.innerHTML = "× 不通过（多选）";
     singleRefuseButton.style.cursor = "pointer";
     singleRefuseButton.style.marginTop = "10px";
     // singleRefuseButton.style.backgroundColor = "#e8806b";
@@ -401,12 +414,6 @@
           resolve(false);
         });
     });
-  }
-
-  function getOperatorName() {
-    return document
-      .querySelector(".app-header .top_right label span")
-      .innerText.trim();
   }
 
   async function getDetail() {
