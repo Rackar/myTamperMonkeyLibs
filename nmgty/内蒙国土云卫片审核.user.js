@@ -14,7 +14,8 @@
   // const HOST = "https://nmgwxyy.cn/alatan/yangxuweb/noauth/"; // web调试地址
   const API_ADDRESS = HOST + "nmgty"; //
   const DICT_ADDRESS = HOST + "nmgty/dict";
-
+  let stage = 1;
+  let selectTitle = "";
   hideUI();
   addUI();
   function hideUI() {
@@ -30,6 +31,19 @@
         hdiv[1].style.height = "500px";
       }
     }, 1000);
+  }
+
+  function changeStage(level) {
+    stage = level;
+    const stage1div = document.querySelector("#stage1");
+    const stage2div = document.querySelector("#stage2");
+    if (level == 1) {
+      stage1div.style.display = "block";
+      stage2div.style.display = "none";
+    } else {
+      stage2div.style.display = "block";
+      stage1div.style.display = "none";
+    }
   }
 
   async function addUI() {
@@ -57,8 +71,13 @@
     containerDiv.style.backgroundColor = "#efefef";
     containerDiv.style.cursor = "move";
 
-    containerDiv.style.left = "10px";
+    containerDiv.style.left = "375px";
     containerDiv.style.top = "10px";
+    let top = localStorage.getItem("nmgty_top");
+    let left = localStorage.getItem("nmgty_left");
+    if (top) containerDiv.style.top = top;
+    if (left) containerDiv.style.left = left;
+
     document.body.appendChild(containerDiv);
 
     // 创建关闭按钮
@@ -70,6 +89,9 @@
     closeButton.style.background = "#ccc";
     closeButton.style.border = "none";
     closeButton.style.color = "#fff";
+    closeButton.style.width = "18px";
+    closeButton.style.fontSize = "16px";
+    closeButton.style.lineHeight = "18px";
     // closeButton.style.padding = "2px 5px";
     closeButton.style.cursor = "pointer";
     closeButton.style.borderRadius = "50%"; // 使按钮呈圆形
@@ -89,6 +111,46 @@
 
     //#region   添加通过UI框
 
+    var stage1Container = document.createElement("div"); // 创建一个容器来存放所有的选择框
+    stage1Container.style.display = "block"; // 改变布局方式以便更好地排列复选框
+    stage1Container.style.flexWrap = "wrap"; // 允许换行
+    stage1Container.style.justifyContent = "center"; // 水平居中
+    stage1Container.style.marginTop = "20px";
+    stage1Container.style.cursor = "default";
+    stage1Container.style.backgroundColor = "#e6e6e6";
+    stage1Container.id = "stage1";
+    containerDiv.appendChild(stage1Container); // 将容器添加到页面中
+
+    var stage2Container = document.createElement("div"); // 创建一个容器来存放所有的选择框
+    stage2Container.style.display = "none"; // 改变布局方式以便更好地排列复选框
+    stage2Container.style.flexWrap = "wrap"; // 允许换行
+    stage2Container.style.justifyContent = "center"; // 水平居中
+    stage2Container.style.marginTop = "20px";
+    stage2Container.style.cursor = "default";
+    stage2Container.style.backgroundColor = "#e6e6e6";
+    stage2Container.id = "stage2";
+    containerDiv.appendChild(stage2Container); // 将容器添加到页面中
+
+    var passContainer0 = document.createElement("div"); // 创建一个容器来存放所有的选择框
+    passContainer0.style.display = "block"; // 改变布局方式以便更好地排列复选框
+    passContainer0.style.flexWrap = "wrap"; // 允许换行
+    passContainer0.style.justifyContent = "center"; // 水平居中
+    passContainer0.style.marginTop = "20px";
+    passContainer0.style.cursor = "default";
+    passContainer0.style.backgroundColor = "#e6e6e6";
+    passContainer0.id = "typeCheckbox";
+    stage1Container.appendChild(passContainer0); // 将容器添加到页面中
+
+    var selectTitle = document.createElement("div"); // 创建一个容器来存放所有的选择框
+    selectTitle.style.display = "block"; // 改变布局方式以便更好地排列复选框
+    selectTitle.style.flexWrap = "wrap"; // 允许换行
+    selectTitle.style.justifyContent = "center"; // 水平居中
+    selectTitle.style.marginTop = "20px";
+    selectTitle.style.cursor = "default";
+    selectTitle.style.backgroundColor = "#e6e6e6";
+    selectTitle.id = "selectTitle";
+    stage2Container.appendChild(selectTitle); // 将容器添加到页面中
+
     var passContainer = document.createElement("div"); // 创建一个容器来存放所有的选择框
     passContainer.style.display = "block"; // 改变布局方式以便更好地排列复选框
     passContainer.style.flexWrap = "wrap"; // 允许换行
@@ -97,7 +159,7 @@
     passContainer.style.cursor = "default";
     passContainer.style.backgroundColor = "#e6e6e6";
     passContainer.id = "myPassCheckbox";
-    containerDiv.appendChild(passContainer); // 将容器添加到页面中
+    stage2Container.appendChild(passContainer); // 将容器添加到页面中
 
     // 拉取数据字典
     let dict_data = await fetch(DICT_ADDRESS, {
@@ -108,6 +170,8 @@
     }).then((response) => response.json());
 
     console.log(dict_data);
+    const optionsType =
+      dict_data?.data?.filter((el) => el.type == "图斑类型") || [];
     const optionsPass =
       dict_data?.data?.filter((el) => el.type == "通过") || [];
     const options = dict_data?.data?.filter((el) => el.type == "不通过") || [];
@@ -146,9 +210,43 @@
     passContainer2.style.justifyContent = "center"; // 水平居中
     passContainer2.style.cursor = "default";
     passContainer2.id = "myPassPanel";
-    containerDiv.appendChild(passContainer2); // 将容器添加到页面中
+    stage2Container.appendChild(passContainer2); // 将容器添加到页面中
 
     // #region 多选退回理由模块
+    // 动态创建多个复选框
+    optionsType.forEach(function (optionText, index) {
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox"; // 设置类型为复选框
+      checkbox.id = "typecheckbox" + (index + 1); // 为每个复选框分配唯一ID
+      checkbox.name = "typeoptions" + index + 1; // 如果需要在表单提交时收集这些值，可以设置相同的name属性
+
+      var div = document.createElement("div");
+      div.style.display = "flex";
+      div.style.alignItems = "normal";
+
+      var label = document.createElement("label");
+      label.htmlFor = checkbox.id; // 关联label和checkbox
+      label.style.marginLeft = "2px";
+      label.style.userSelect = "none";
+      label.appendChild(document.createTextNode(optionText.name)); // 在label中添加文本
+
+      div.appendChild(checkbox); // 将复选框添加到容器中
+      div.appendChild(label); // 将label添加到容器中
+      passContainer0.appendChild(div); // 添加换行，可按需调整布局
+    });
+
+    // 创建选择类型按钮
+    var typeButton = document.createElement("button");
+    typeButton.id = "singleButton";
+    typeButton.innerHTML = "确定图斑类型";
+    typeButton.style.marginTop = "10px";
+    typeButton.style.cursor = "pointer";
+    //  singleButton.style.backgroundColor = "#edffed";
+    typeButton.classList.add("hoverbtn");
+    typeButton.classList.add("passbtn");
+    passContainer0.appendChild(typeButton);
+    typeButton.addEventListener("click", selectType);
+
     // 动态创建多个复选框
     optionsPass.forEach(function (optionText, index) {
       var checkbox = document.createElement("input");
@@ -223,7 +321,7 @@
     refuseContainer2.style.cursor = "default";
     refuseContainer2.style.backgroundColor = "#e6e6e6";
     refuseContainer2.id = "myCheckbox";
-    containerDiv.appendChild(refuseContainer2); // 将容器添加到页面中
+    stage2Container.appendChild(refuseContainer2); // 将容器添加到页面中
 
     // #region 多选退回理由模块
     // 动态创建多个复选框
@@ -249,7 +347,7 @@
     });
 
     var reBtnContainer = document.createElement("div");
-    containerDiv.appendChild(reBtnContainer);
+    stage2Container.appendChild(reBtnContainer);
     // 创建单次不通过按钮
     var singleRefuseButton = document.createElement("button");
     singleRefuseButton.id = "singleRefuseButton";
@@ -320,6 +418,8 @@
         pos4 = e.clientY;
         element.style.top = element.offsetTop - pos2 + "px";
         element.style.left = element.offsetLeft - pos1 + "px";
+        localStorage.setItem("nmgty_top", element.style.top);
+        localStorage.setItem("nmgty_left", element.style.left);
       }
 
       function closeDragElement() {
@@ -463,6 +563,30 @@
     await sleepSec(300);
   }
 
+  async function typeSaveBtn() {
+    // 检查url中包含不包含spotListDetail
+    let url = window.location.href;
+    if (!url.includes("spotListDetail")) {
+      return alert("请先进入详情页面查看举证情况");
+    }
+
+    let data = await getDetail();
+
+    await jumpToPassTab();
+
+    let radioPass = readPassCheckboxValues();
+    if (!radioPass) {
+      return alert("请先进选择通过类型");
+    }
+
+    changeStage(2);
+
+    // await sleepSec(600);
+    // let nextBtn = document.querySelector(
+    //   ".ant-table-tbody td.ant-table-cell-fix-right-first a"
+    // );
+    // nextBtn.click();
+  }
   async function clickSaveBtn() {
     // 检查url中包含不包含spotListDetail
     let url = window.location.href;
@@ -499,6 +623,7 @@
     sbtn[1].click(); //确定键，调试时按取消[0]
     // sbtn[0].click();
     let postok = await postRefuseReason("通过", radioPass, data);
+    resetType();
     if (postok === false) {
       alert("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
     }
@@ -545,6 +670,7 @@
     sbtn[1].click(); //确定键，调试时按取消
     // sbtn[0].click();
     let postok = await postRefuseReason("不通过", radioPass, data);
+    resetType();
     if (postok === false) {
       alert("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
     }
@@ -576,10 +702,47 @@
     }
   }
 
+  function selectType() {
+    selectTitle = readStageCheckboxValues();
+    showSelectType(selectTitle);
+    changeStage(2);
+  }
+
+  function resetType() {
+    selectTitle = "";
+    showSelectType();
+    changeStage(1);
+  }
+
+  function showSelectType(selectTypesString) {
+    if (selectTypesString) {
+      document.querySelector("#selectTitle").innerText =
+        "已选类型：" + selectTypesString;
+    } else {
+      document.querySelector("#selectTitle").innerText = "";
+    }
+  }
+
+  function readStageCheckboxValues() {
+    var checkboxes = document.querySelectorAll(
+      '#stageCheckbox input[type="checkbox"]:checked'
+    ); // 选取所有被选中的复选框
+    var selectedOptions = []; // 用于存储选中的选项文本
+
+    checkboxes.forEach(function (checkbox) {
+      var label = checkbox.labels[0];
+      if (label) {
+        selectedOptions.push(label.innerText);
+      }
+    });
+
+    return selectedOptions.join("。"); // 将数组转换为以逗号分隔的字符串并返回
+  }
+
   // 读取通过多选项
   function readPassCheckboxValues() {
     var checkboxes = document.querySelectorAll(
-      '#myPassCheckbox input[type="checkbox"]:checked'
+      '#typeCheckbox input[type="checkbox"]:checked'
     ); // 选取所有被选中的复选框
     var selectedOptions = []; // 用于存储选中的选项文本
 

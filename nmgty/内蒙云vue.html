@@ -16,8 +16,8 @@
 
 <body>
   <div id="app">
-    <el-dialog v-model="showMsg" title="判定辅助工具" width="400" draggable :modal="false" :close-on-click-modal="false"
-      :close-on-press-escape="false">
+    <el-dialog id="dialog" v-model="showMsg" class="topdia" title="判定辅助工具" width="400" draggable :modal="false"
+      modal-class="dialog_class" :append-to-body="false" :close-on-click-modal="false" :close-on-press-escape="false">
 
       <el-tabs v-model="activeTab" type="border-card">
         <el-tab-pane label="图斑类型" name="图斑类型">
@@ -53,11 +53,48 @@
       </el-tabs>
     </el-dialog>
     <div>
+      test
+      <el-button>test</el-button>
+    </div>
+
+
+    <div>
 
 
     </div>
 
   </div>
+  <style>
+    /* #app div:first-child {
+      inset: auto !important;
+    } */
+
+    #dialog {
+      width: 350px;
+    }
+
+    #dialog .el-dialog__header {
+      cursor: move;
+    }
+
+    #dialog .el-dialog__close svg {
+      width: 20px;
+    }
+
+    .dialog_class {
+      pointer-events: none;
+    }
+
+    /* // 覆盖层元素增加可穿透点击事件 */
+    .el-overlay-dialog {
+      pointer-events: none;
+    }
+
+    /* // 弹窗层元素不可穿透点击事件（不影响弹窗层元素的点击事件） */
+    .el-dialog {
+      pointer-events: auto;
+    }
+  </style>
   <script>
     const { createApp } = Vue
     const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t正式地址 pm2启用
@@ -214,7 +251,7 @@
 
           await jumpToPassTab();
 
-          let radioPass = passChecked.join("; ") + "; " + this.textarea;
+          let radioPass = this.passChecked.join("; ") + "; " + this.textarea;
 
 
           let passpanel = document.querySelector("#pane-check");
@@ -235,7 +272,7 @@
             ".el-message-box .el-message-box__btns button"
           );
           sbtn[1].click(); //确定键，调试时按取消[0]
-          let postok = await postRefuseReason("通过", typeChecked.join("; ") + radioPass, data);
+          let postok = await postRefuseReason("通过", this.typeChecked.join("; ") + radioPass, data);
           this.resetAll();
           if (postok === false) {
             this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
@@ -257,7 +294,7 @@
 
           await jumpToPassTab();
 
-          let radioPass = refuseChecked.join("; ") + "; " + this.textarea;
+          let radioPass = this.refuseChecked.join("; ") + "; " + this.textarea;
 
 
           let passpanel = document.querySelector("#pane-check");
@@ -277,7 +314,7 @@
             ".el-message-box .el-message-box__btns button"
           );
           sbtn[1].click(); //确定键，调试时按取消[0]
-          let postok = await postRefuseReason("不通过", typeChecked.join("; ") + radioPass, data);
+          let postok = await postRefuseReason("不通过", this.typeChecked.join("; ") + radioPass, data);
           this.resetAll();
           if (postok === false) {
             this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");

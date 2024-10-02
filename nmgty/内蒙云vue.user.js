@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         内蒙国土云卫片审核-测试vue+element plus
+// @name         内蒙国土云卫片审核-网络版
 // @namespace    rackar
 // @version      1.0
 // @description  nclzgdjf
@@ -13,20 +13,20 @@ let script = document.createElement("script");
 script.setAttribute("type", "text/javascript");
 script.src = "https://cdn.jsdelivr.net/npm/vue";
 document.documentElement.appendChild(script);
-//引入element-plus的CSS样式文件
-let link = document.createElement("link");
-link.setAttribute("rel", "stylesheet");
-link.href = "https://unpkg.com/element-plus/dist/index.css";
-document.documentElement.appendChild(link);
+//引入element-plus的CSS样式文件 样式冲突暂时屏蔽
+// let link = document.createElement("link");
+// link.setAttribute("rel", "stylesheet");
+// link.href = "https://unpkg.com/element-plus/dist/index.css";
+// document.documentElement.appendChild(link);
 //引入element-plus的JS文件
 let elscript = document.createElement("script");
 elscript.setAttribute("type", "text/javascript");
 elscript.src = "https://unpkg.com/element-plus";
 document.documentElement.appendChild(elscript);
 window.onload = () => {
-  let text = ` <div id="app">
-    <el-dialog v-model="showMsg" title="判定辅助工具" width="300" draggable :modal="false" :close-on-click-modal="false"
-      :close-on-press-escape="false">
+  let text = `<div id="app">
+    <el-dialog id="dialog" v-model="showMsg" class="topdia" title="判定辅助工具" width="400" draggable :modal="false"
+      modal-class="dialog_class" :append-to-body="false" :close-on-click-modal="false" :close-on-press-escape="false">
 
       <el-tabs v-model="activeTab" type="border-card">
         <el-tab-pane label="图斑类型" name="图斑类型">
@@ -62,11 +62,48 @@ window.onload = () => {
       </el-tabs>
     </el-dialog>
     <div>
+      test
+      <el-button>test</el-button>
+    </div>
+
+
+    <div>
 
 
     </div>
 
-  </div>`;
+  </div>
+  <style>
+    /* #app div:first-child {
+      inset: auto !important;
+    } */
+
+    #dialog {
+      width: 350px;
+    }
+
+    #dialog .el-dialog__header {
+      cursor: move;
+    }
+
+    #dialog .el-dialog__close svg {
+      width: 20px;
+    }
+
+    .dialog_class {
+      pointer-events: none;
+    }
+
+    /* // 覆盖层元素增加可穿透点击事件 */
+    .el-overlay-dialog {
+      pointer-events: none;
+    }
+
+    /* // 弹窗层元素不可穿透点击事件（不影响弹窗层元素的点击事件） */
+    .el-dialog {
+      pointer-events: auto;
+    }
+  </style>`;
 
   var el = document.createElement("div");
   el.innerHTML = text;
@@ -224,7 +261,7 @@ window.onload = () => {
 
         await jumpToPassTab();
 
-        let radioPass = passChecked.join("; ") + "; " + this.textarea;
+        let radioPass = this.passChecked.join("; ") + "; " + this.textarea;
 
         let passpanel = document.querySelector("#pane-check");
         let inputRadio = passpanel.querySelectorAll("input[type=radio]");
@@ -243,10 +280,11 @@ window.onload = () => {
         let sbtn = document.querySelectorAll(
           ".el-message-box .el-message-box__btns button"
         );
+
         sbtn[1].click(); //确定键，调试时按取消[0]
         let postok = await postRefuseReason(
           "通过",
-          typeChecked.join("; ") + radioPass,
+          this.typeChecked.join("; ") + radioPass,
           data
         );
         this.resetAll();
@@ -272,7 +310,7 @@ window.onload = () => {
 
         await jumpToPassTab();
 
-        let radioPass = refuseChecked.join("; ") + "; " + this.textarea;
+        let radioPass = this.refuseChecked.join("; ") + "; " + this.textarea;
 
         let passpanel = document.querySelector("#pane-check");
         let inputRadio = passpanel.querySelectorAll("input[type=radio]");
@@ -290,10 +328,11 @@ window.onload = () => {
         let sbtn = document.querySelectorAll(
           ".el-message-box .el-message-box__btns button"
         );
+
         sbtn[1].click(); //确定键，调试时按取消[0]
         let postok = await postRefuseReason(
           "不通过",
-          typeChecked.join("; ") + radioPass,
+          this.typeChecked.join("; ") + radioPass,
           data
         );
         this.resetAll();
