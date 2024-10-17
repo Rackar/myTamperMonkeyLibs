@@ -1,9 +1,5 @@
-function testRemote(pm) {
-  console.log("成功", pm);
-}
-
 // ==UserScript==
-// @name         内蒙国土云卫片审核-网络更新版
+// @name         内蒙国土云卫片审核-网络更新版服务端
 // @namespace    rackar
 // @version      1.0
 // @description  nclzgdjf
@@ -112,6 +108,7 @@ window.onload = () => {
   var el = document.createElement("div");
   el.innerHTML = text;
   document.body.append(el);
+
   const { createApp } = Vue;
   const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t正式地址 pm2启用
   const API_ADDRESS = HOST + "nmgty"; //
@@ -201,6 +198,13 @@ window.onload = () => {
     });
   }
 
+  function resetSubmitArea(textbox) {
+    if (textbox) {
+      textbox.value = "";
+      textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
+    }
+  }
+
   createApp({
     data() {
       return {
@@ -284,7 +288,6 @@ window.onload = () => {
         let sbtn = document.querySelectorAll(
           ".el-message-box .el-message-box__btns button"
         );
-
         sbtn[1].click(); //确定键，调试时按取消[0]
         let postok = await postRefuseReason(
           "通过",
@@ -292,6 +295,7 @@ window.onload = () => {
           data
         );
         this.resetAll();
+        resetSubmitArea(textbox);
         if (postok === false) {
           this.$message.error(
             "出现问题，提交保存失败。请记录图斑号和通过理由在群里上报"
@@ -332,7 +336,6 @@ window.onload = () => {
         let sbtn = document.querySelectorAll(
           ".el-message-box .el-message-box__btns button"
         );
-
         sbtn[1].click(); //确定键，调试时按取消[0]
         let postok = await postRefuseReason(
           "不通过",
@@ -340,6 +343,7 @@ window.onload = () => {
           data
         );
         this.resetAll();
+        resetSubmitArea(textbox);
         if (postok === false) {
           this.$message.error(
             "出现问题，提交保存失败。请记录图斑号和通过理由在群里上报"

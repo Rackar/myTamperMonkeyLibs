@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         内蒙国土云卫片审核-网络版拉取更新
+// @name         内蒙国土云卫片审核-网络版自动更新版
 // @namespace    rackar
 // @version      1.0
 // @description  nclzgdjf

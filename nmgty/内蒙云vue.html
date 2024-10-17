@@ -185,6 +185,13 @@
       });
     }
 
+    function resetSubmitArea(textbox) {
+      if (textbox) {
+        textbox.value = "";
+        textbox.dispatchEvent(new Event("input", { bubbles: true })); //触发input事件
+      }
+    }
+
     createApp({
       data() {
         return {
@@ -274,6 +281,7 @@
           sbtn[1].click(); //确定键，调试时按取消[0]
           let postok = await postRefuseReason("通过", this.typeChecked.join("; ") + radioPass, data);
           this.resetAll();
+          resetSubmitArea(textbox)
           if (postok === false) {
             this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
           }
@@ -316,6 +324,7 @@
           sbtn[1].click(); //确定键，调试时按取消[0]
           let postok = await postRefuseReason("不通过", this.typeChecked.join("; ") + radioPass, data);
           this.resetAll();
+          resetSubmitArea(textbox)
           if (postok === false) {
             this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
           }
