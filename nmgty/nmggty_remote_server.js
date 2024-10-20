@@ -11,7 +11,7 @@
 //引入Vue
 let script = document.createElement("script");
 script.setAttribute("type", "text/javascript");
-script.src = "https://cdn.jsdelivr.net/npm/vue";
+script.src = "https://nmgwxyy.cn/alatan/yangxuweb/monkey/vue3.5.12.global.js";
 document.documentElement.appendChild(script);
 //引入element-plus的CSS样式文件 样式冲突暂时屏蔽
 // let link = document.createElement("link");
@@ -21,7 +21,8 @@ document.documentElement.appendChild(script);
 //引入element-plus的JS文件
 let elscript = document.createElement("script");
 elscript.setAttribute("type", "text/javascript");
-elscript.src = "https://unpkg.com/element-plus";
+elscript.src =
+  "https://nmgwxyy.cn/alatan/yangxuweb/monkey/element-plus@2.8.6.full.js";
 document.documentElement.appendChild(elscript);
 window.onload = () => {
   let text = `<div id="app">
