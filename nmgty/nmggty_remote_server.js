@@ -43,7 +43,7 @@ window.onload = () => {
             </el-checkbox>
           </el-checkbox-group>
           <div>
-            <el-input v-model="textarea" :rows="2" type="textarea" placeholder="输入其他补充内容" />
+            <el-input v-model="textarea" :rows="2" type="textarea" placeholder="输入其他补充内容" key="pass" />
           </div>
 
           <el-button type="primary" @click="tong_guo">通过</el-button>
@@ -54,7 +54,7 @@ window.onload = () => {
             </el-checkbox>
           </el-checkbox-group>
           <div>
-            <el-input v-model="textarea" :rows="2" type="textarea" placeholder="输入其他补充内容" />
+            <el-input v-model="textarea2" :rows="2" type="textarea" placeholder="输入其他补充内容" key="refuse" />
           </div>
 
           <el-button type="warning" @click="bu_tong_guo">不通过</el-button>
@@ -216,6 +216,7 @@ window.onload = () => {
         passChecked: [],
         refuseChecked: [],
         textarea: "",
+        textarea2: "",
       };
     },
     computed: {
@@ -246,6 +247,7 @@ window.onload = () => {
         this.passChecked = [];
         this.refuseChecked = [];
         this.textarea = "";
+        this.textarea2 = "";
       },
       dai_tong_guo() {
         this.activeTab = "通过";
@@ -266,6 +268,7 @@ window.onload = () => {
         }
 
         let data = await getDetail();
+        data.sh_lx = this.typeChecked;
 
         await jumpToPassTab();
 
@@ -315,10 +318,11 @@ window.onload = () => {
         }
 
         let data = await getDetail();
+        data.sh_lx = this.typeChecked;
 
         await jumpToPassTab();
 
-        let radioPass = this.refuseChecked.join("; ") + "; " + this.textarea;
+        let radioPass = this.refuseChecked.join("; ") + "; " + this.textarea2;
 
         let passpanel = document.querySelector("#pane-check");
         let inputRadio = passpanel.querySelectorAll("input[type=radio]");
@@ -330,7 +334,7 @@ window.onload = () => {
         }
 
         await sleepSec(400);
-        let btn = passpanel.querySelector("button.el-button--success");
+        let btn = passpanel.querySelector("button.el-button--default");
         btn.click();
         await sleepSec(300);
         let sbtn = document.querySelectorAll(
