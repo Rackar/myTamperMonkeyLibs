@@ -180,6 +180,7 @@
           })
           .catch((error) => {
             console.error("错误:", error);
+            alert("后台响应报错")
             resolve(false);
           });
       });
@@ -257,7 +258,7 @@
           }
 
           let data = await getDetail();
-          data.sh_lx = this.typeChecked
+          data.sh_lx = this.typeChecked.join(';') || ""
 
           await jumpToPassTab();
 
@@ -285,7 +286,7 @@
           let postok = await postRefuseReason("通过", this.typeChecked.join("; ") + radioPass, data);
           this.resetAll();
           resetSubmitArea(textbox)
-          if (postok === false) {
+          if (!postok) {
             this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
           }
         },
@@ -302,7 +303,7 @@
           }
 
           let data = await getDetail();
-          data.sh_lx = this.typeChecked
+          data.sh_lx = this.typeChecked.join(';') || ""
 
           await jumpToPassTab();
 
@@ -329,7 +330,7 @@
           let postok = await postRefuseReason("不通过", this.typeChecked.join("; ") + radioPass, data);
           this.resetAll();
           resetSubmitArea(textbox)
-          if (postok === false) {
+          if (!postok) {
             this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
           }
         }
