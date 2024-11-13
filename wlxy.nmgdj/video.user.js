@@ -49,26 +49,66 @@
     location.reload();
     console.log("刷新页面");
   }
-  function closePage() {
+  async function startPlay() {
+    if (checkCompletedState()) {
+      return closeCurrentPage();
+    } else {
+      await skipFinishedVideo();
+    }
     let v = document.querySelector("video");
-    // v.muted = true;
+    v.muted = true; //必须先静音，不然不给播放
     v.play();
     v.addEventListener("ended", async function () {
       console.log("自定义监听：视频播放已结束！");
-      let index = parseInt(localStorage.getItem("list-start-index")) || 0;
-      localStorage.setItem("list-start-index", index + 1);
       await sleepSec(6);
-      closeCurrentPage();
+      if (checkCompletedState()) {
+        let index = parseInt(localStorage.getItem("list-start-index")) || 0;
+        localStorage.setItem("list-start-index", index + 1);
+        closeCurrentPage();
+      }
+
       // 在这里添加你想要执行的代码
     });
     // player.videoMute();
     // let data = player.getMetaDate();
-    let toal = data.v + 120;
+
     console.log("finish part 1");
     // setTimeout(closeCurrentPage, toal * 1000);
   }
 
+  function checkCompletedState() {
+    let title = document.querySelector(
+      '.simplebar-content div[class^="$id--player_side_title--"]'
+    );
+    let text = title.innerText.replace("课程章节(", "").replace(")", "");
+    let split = text.split("/");
+    let current = split[0];
+    let total = split[1];
+    if (current == total) return true;
+    return false;
+  }
+
+  async function skipFinishedVideo() {
+    let list = document.querySelector(
+      '.simplebar-content div[class^="$id--player_side_item_wrap"]'
+    ).children;
+
+    for (let i = 0; i < list.length; i++) {
+      let item = list[i];
+      let percent = item.querySelector(
+        'div[class^="$id--player_side_item_progress"] span.ant-progress-text'
+      );
+      if (percent.innerText == "100%") {
+        continue;
+      } else {
+        item.click();
+        break;
+      }
+    }
+    await sleepSec(3);
+  }
+
   setTimeout(() => {
-    closePage();
-  }, 4 * 1000);
+    startPlay();
+  }, 3 * 1000);
 })();
