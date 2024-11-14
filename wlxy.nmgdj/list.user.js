@@ -8,29 +8,8 @@
 // @grant        none
 // ==/UserScript==
 
-(function () {
-  "use strict";
-  function sleepSec(sec) {
-    return new Promise((resolve) => setTimeout(resolve, sec * 1000));
-  }
-
-  async function getList() {
-    let wraper = document.querySelector('div[class^="Course--container--"]');
-    let cards = wraper.querySelectorAll('div[class^="Card--card--"]');
-    let index = parseInt(localStorage.getItem("list-start-index")) || 0;
-
-    // for (let i = index; i < cards.length; i++) {
-    let card = cards[index];
-    card.click();
-    await sleepSec(5);
-    console.log("等待5秒");
-    location.reload();
-    console.log("刷新页面");
-    await sleepSec(2 * 3600);
-    // }
-  }
-
-  setTimeout(() => {
-    getList();
-  }, 4 * 1000);
-})();
+let remotescript = document.createElement("script");
+remotescript.setAttribute("type", "text/javascript");
+remotescript.src =
+  "https://nmgwxyy.cn/alatan/yangxuweb/monkey/wlxy.nmgdj/list.js";
+document.documentElement.appendChild(remotescript);
