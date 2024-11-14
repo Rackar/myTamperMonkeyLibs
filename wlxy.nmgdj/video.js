@@ -34,6 +34,9 @@
   }
 
   async function checkOnce() {
+    if (checkCompletedState()) {
+      return closeCurrentPage();
+    }
     let video = document.querySelector("video");
     if (video && video.paused) {
       console.log("视频已暂停！");
