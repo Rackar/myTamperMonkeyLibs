@@ -23,11 +23,11 @@
   let quitLoop = false;
 
   let code = "150000";
-  let arr = ["150102202412020024", "150102202412040007"];
+  let arr = [];
 
   let running = false;
   init();
-  // openDb();
+  openDb();
   /**
    * 打开或创建一个名为 myDatabase 的 IndexedDB 数据库
    * 该数据库版本为 1，如果数据库版本更新，会触发 onupgradeneeded 事件
@@ -59,7 +59,7 @@
       // 获取数据库对象
       db = event.target.result;
       // 创建一个名为 person 的对象存储，主键为 id，自动递增
-      const objectStore = db.createObjectStore("person", {
+      const objectStore = db.createObjectStore("record", {
         keyPath: "id",
         autoIncrement: true,
       });
@@ -73,20 +73,20 @@
 
   function addRow(bsm, tongguo = 1) {
     // console.log("数据待写入", bsm);
-    const transaction = db.transaction(["person"], "readwrite");
+    const transaction = db.transaction(["record"], "readwrite");
     // transaction.oncomplete = function (event) {
     //   console.log("事务完成，但无法确定是否成功创建了对象存储。");
     // };
     // transaction.onerror = function (event) {
     //   console.log("事务失败。");
     // };
-    const request = transaction.objectStore("person").add({ bsm, tongguo });
-    // request.onsuccess = function (event) {
-    //   console.log("数据写入成功", bsm);
-    // };
-    // request.onerror = function (event) {
-    //   console.log("数据写入失败", event);
-    // };
+    const request = transaction.objectStore("record").add({ bsm, tongguo });
+    request.onsuccess = function (event) {
+      console.log("数据写入成功", bsm);
+    };
+    request.onerror = function (event) {
+      console.log("数据写入失败", event);
+    };
   }
 
   // Your code here...
@@ -111,20 +111,9 @@
         console.log("其他页面");
       }
     }, 100);
-    // $(document).ready(function () {
-    //   setTimeout(function () {
-    //     var iframe = $("#activeIframe")[0].contentWindow;
-    //     var contentDoc = iframe.document || iframe.contentWindow.document;
-
-    //     var element = $(contentDoc).find("#app");
-    //     console.log(element);
-    //   }, 10000);
-
-    //   // 现在你可以操作element了
-    // });
   }
-  async function operateWholeList(params) {
-    await clickIntoInfo();
+  async function operateWholeList(passOrRefuse = true) {
+    await clickIntoInfo(passOrRefuse);
   }
   async function jumpInFirstDetail() {}
 
@@ -134,7 +123,10 @@
 
     //检测skipCheckbox是否选中,选中则直接提交
     let checkedSkip = document.querySelector("#skipCheckbox").checked;
-    if (checkedSkip) return operateWholeList();
+    if (checkedSkip && arr.length != 0) {
+      alert("已勾选全部操作，但是列表没有清空");
+      return;
+    } else if (checkedSkip) return operateWholeList(passOrRefuse);
 
     let idlist = getRows();
     const errorList = [];
@@ -170,15 +162,6 @@
           }
           continue;
         }
-        await sleepSec(1002);
-        let noNetError2 = await clickSaveBtn(id);
-        if (!noNetError2) {
-          if (!errorList.includes(id)) {
-            errorList.push(id);
-          }
-          continue;
-        }
-        await sleepSec(1003);
       } catch (error) {
         try {
           //网络不好重试一次
@@ -232,11 +215,25 @@
     ) {
       return alert("需进入国土云林草审核专项");
     }
-    // await jumpStartPage();//回到第一页
-    // await clickDetail(); //进入详情页
+
+    // 获取文本框内容并处理成数组
+    const textarea = document.querySelector("#batchInput");
+    const content = textarea.value.trim();
+    if (!content) {
+      return alert("请输入要处理的编号");
+    }
+
+    // 将输入的文本按行分割，并过滤掉空行
+    arr = content
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line);
+
+    if (arr.length === 0) {
+      return alert("没有有效的编号");
+    }
 
     quitLoop = false;
-
     await findConditionAndNext(true);
   }
 
@@ -249,11 +246,25 @@
     ) {
       return alert("需进入国土云林草审核专项");
     }
-    // await jumpStartPage();//回到第一页
-    // await clickDetail(); //进入详情页
+
+    // 获取文本框内容并处理成数组
+    const textarea = document.querySelector("#batchInput");
+    const content = textarea.value.trim();
+    if (!content) {
+      return alert("请输入要处理的编号");
+    }
+
+    // 将输入的文本按行分割，并过滤掉空行
+    arr = content
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line);
+
+    if (arr.length === 0) {
+      return alert("没有有效的编号");
+    }
 
     quitLoop = false;
-
     await findConditionAndNext(false);
   }
 
@@ -357,13 +368,22 @@
 
     containerDiv.appendChild(subContainer);
 
+    // 添加多行文本输入
+    const textarea = document.createElement("textarea");
+    textarea.id = "batchInput";
+    textarea.placeholder = "请输入要处理的编号，每行一个";
+    textarea.style.width = "200px";
+    textarea.style.height = "100px";
+    textarea.style.marginBottom = "10px";
+    containerDiv.appendChild(textarea);
+
     //创建一个复选框，可以选择是否跳过检测
     var checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.id = "skipCheckbox";
     checkbox.style.marginRight = "4px";
     subContainer.appendChild(checkbox);
-    //复选框后加一个label绑定
+    //复选框加���个label绑定
     var checkboxLabel = document.createElement("label");
     checkboxLabel.htmlFor = "skipCheckbox";
     checkboxLabel.textContent = "勾选后不读列表，全部操作";
@@ -394,7 +414,7 @@
     // 创建开始执行按钮
     const refuseButton = document.createElement("button");
     refuseButton.id = "refuseButton";
-    refuseButton.innerHTML = "开始批量退回";
+    refuseButton.innerHTML = "开��批量退回";
     refuseButton.style.marginTop = "10px";
     containerDiv.appendChild(refuseButton);
 
@@ -432,34 +452,130 @@
         pos2 = 0,
         pos3 = 0,
         pos4 = 0;
+      let isDragging = false;
 
-      element.onmousedown = dragMouseDown;
+      // 设置容器的初始样式
+      element.style.position = "fixed";
+      element.style.margin = "0";
+      element.style.left = "4px";
+      element.style.top = "400px";
+      // 移除 transform，改用直接定位
+      element.style.transform = "";
+
+      const dragHandle = document.createElement("div");
+      dragHandle.style.position = "absolute";
+      dragHandle.style.top = "0";
+      dragHandle.style.left = "0";
+      dragHandle.style.right = "0";
+      dragHandle.style.height = "30px";
+      dragHandle.style.backgroundColor = "#e0e0e0";
+      dragHandle.style.cursor = "move";
+      dragHandle.style.borderBottom = "1px solid #ccc";
+      dragHandle.style.zIndex = "10000";
+      dragHandle.style.userSelect = "none";
+      dragHandle.style.webkitUserSelect = "none";
+      dragHandle.style.pointerEvents = "auto";
+      element.insertBefore(dragHandle, element.firstChild);
+
+      ["mousedown", "pointerdown", "touchstart"].forEach((eventType) => {
+        dragHandle.addEventListener(eventType, dragMouseDown, {
+          capture: true,
+          passive: false,
+        });
+      });
 
       function dragMouseDown(e) {
-        if (e.target === element) {
-          e.preventDefault();
-          pos3 = e.clientX;
-          pos4 = e.clientY;
-          document.onmouseup = closeDragElement;
-          document.onmousemove = elementDrag;
-        }
+        if (e.target !== dragHandle) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        isDragging = true;
+
+        // 获取初始位置
+        const point = e.touches ? e.touches[0] : e;
+        pos3 = point.clientX;
+        pos4 = point.clientY;
+
+        // 记录元素的初始位置
+        const rect = element.getBoundingClientRect();
+        element.initialLeft = rect.left;
+        element.initialTop = rect.top;
+
+        document.addEventListener("mousemove", elementDrag, {
+          capture: true,
+          passive: false,
+        });
+        document.addEventListener("mouseup", closeDragElement, {
+          capture: true,
+          passive: false,
+        });
+        document.addEventListener("pointermove", elementDrag, {
+          capture: true,
+          passive: false,
+        });
+        document.addEventListener("pointerup", closeDragElement, {
+          capture: true,
+          passive: false,
+        });
       }
 
       function elementDrag(e) {
-        if (e.target === element) {
-          pos1 = pos3 - e.clientX;
-          pos2 = pos4 - e.clientY;
-          pos3 = e.clientX;
-          pos4 = e.clientY;
-          element.style.top = element.offsetTop - pos2 + "px";
-          element.style.left = element.offsetLeft - pos1 + "px";
-        }
+        if (!isDragging) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const point = e.touches ? e.touches[0] : e;
+
+        // 计算位移
+        const dx = point.clientX - pos3;
+        const dy = point.clientY - pos4;
+
+        // 更新位置记录
+        pos3 = point.clientX;
+        pos4 = point.clientY;
+
+        // 直接更新元素位置
+        const newLeft = element.offsetLeft + dx;
+        const newTop = element.offsetTop + dy;
+
+        // 添加边界检查
+        const maxX = window.innerWidth - element.offsetWidth;
+        const maxY = window.innerHeight - element.offsetHeight;
+
+        element.style.left = Math.max(0, Math.min(newLeft, maxX)) + "px";
+        element.style.top = Math.max(0, Math.min(newTop, maxY)) + "px";
       }
 
-      function closeDragElement() {
-        document.onmouseup = null;
-        document.onmousemove = null;
+      function closeDragElement(e) {
+        if (!isDragging) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        isDragging = false;
+
+        // 移除事件监听
+        document.removeEventListener("mousemove", elementDrag, {
+          capture: true,
+        });
+        document.removeEventListener("mouseup", closeDragElement, {
+          capture: true,
+        });
+        document.removeEventListener("pointermove", elementDrag, {
+          capture: true,
+        });
+        document.removeEventListener("pointerup", closeDragElement, {
+          capture: true,
+        });
       }
+
+      // 添加调试样式
+      dragHandle.innerHTML = "可拖动区域 (点击这里拖动)";
+      dragHandle.style.textAlign = "center";
+      dragHandle.style.lineHeight = "30px";
+      dragHandle.style.color = "#666";
     }
   }
 
@@ -519,12 +635,41 @@
       await sleepSec(200);
 
       let btns = doc.querySelectorAll(".pdTable button");
-      if (!TEST_MODE) btns[0].click();
+      if (!TEST_MODE) {
+        btns[0].click();
+        await sleepSec(300);
+        let submit = doc.querySelector(
+          'button.el-button.el-button--default.el-button--small.el-button--primary[type="button"] > span:nth-child(1)'
+        );
+        submit.click();
+      }
     } else {
       radios[1].click();
       await sleepSec(200);
       let btns = doc.querySelectorAll(".pdTable button");
-      if (!TEST_MODE) btns[1].click();
+      if (!TEST_MODE) {
+        btns[1].click();
+        await sleepSec(300);
+        let submit = doc.querySelector(
+          'button.el-button.el-button--default.el-button--small.el-button--primary[type="button"] > span:nth-child(1)'
+        );
+        submit.click();
+      }
+    }
+    // 获取id
+    let ids = doc.querySelectorAll("#pane-1 table.pdTable td");
+    // 找到其中text为地块标识的索引，使用for循环获取
+
+    let index = -1;
+    for (let i = 0; i < ids.length; i++) {
+      if (ids[i].innerText == "地块标识") {
+        index = i;
+        break;
+      }
+    }
+    if (index != -1) {
+      id = ids[index + 1].innerText;
+      addRow(index, pass ? 1 : 0);
     }
 
     return true;
