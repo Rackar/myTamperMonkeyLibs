@@ -46,6 +46,11 @@
       } else {
         startPlay();
       }
+      sleepSec(1);
+    }
+
+    if (v.playbackRate != 1.5) {
+      v.playbackRate = 1.5;
     }
   }
 
@@ -94,7 +99,12 @@
     checkRetryTimes();
     let v = document.querySelector("video");
     v.muted = true; //必须先静音，不然不给播放
+
     v.play();
+    await sleepSec(0.5);
+    console.log("调整1.5倍");
+    v.playbackRate = 1.5; //1.5倍速
+
     v.addEventListener("ended", async function () {
       console.log("自定义监听：视频播放已结束！");
       await sleepSec(6);
@@ -153,6 +163,7 @@
         continue;
       } else {
         item.click();
+
         break;
       }
     }

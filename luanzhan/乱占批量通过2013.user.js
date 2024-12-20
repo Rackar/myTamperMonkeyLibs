@@ -373,9 +373,13 @@
   }
 
   async function readTextareaContent() {
-    let hash = "#/mapRelevancy/dataCheck";
-    if (location.hash != hash) {
-      return alert("需进入审核上报页面: https://xxcj.mnr.gov.cn/" + hash);
+    let href =
+      "https://jg.landcloud.org.cn:5443/main/list/wpzfnddk2024/24/qbdk";
+    if (
+      location.href != href &&
+      location.href.indexOf("#/specialMission") == -1
+    ) {
+      return alert("需要进入国土云卫片执法模块");
     }
 
     // let idlist = getTextarea();

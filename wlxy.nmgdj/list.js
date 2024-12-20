@@ -5,6 +5,7 @@
 // @description  try to take over the world!
 // @author       rackar
 // @match        https://wlxy.nmgdj.gov.cn/course
+// @match        https://wlxy.nmgdj.gov.cn/course
 // @grant        none
 // ==/UserScript==
 
