@@ -22,11 +22,12 @@
 
     // for (let i = index; i < cards.length; i++) {
     let card = cards[index];
-    for (let i = 0; i < 10; i++) {
+    let limit = index > 100 ? index / 10 : 10;
+    for (let i = 0; i < limit; i++) {
       if (!card) {
         document.body.scrollTo({ top: 1000 + i * 800, behavior: "smooth" });
-        await sleepSec(1);
-        console.log("等待1秒");
+        await sleepSec(1.5);
+        console.log("等待1.5秒");
         cards = wraper.querySelectorAll('div[class^="Card--card--"]');
         card = cards[index];
       } else {

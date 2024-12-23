@@ -119,12 +119,14 @@ try {
       let iframe = document.querySelector("iframe");
       let doc = iframe.contentDocument;
 
-      //检测skipCheckbox是否选中,选中则直接提交
-      let checkedSkip = document.querySelector("#skipCheckbox").checked;
-      if (checkedSkip && arr.length != 0) {
-        alert("已勾选全部操作，但是列表没有清空");
+      // 检查是否选择全部列表处理
+      let isAllListProcess = document.querySelector("#allListProcess").checked;
+      if (isAllListProcess && arr.length != 0) {
+        alert("已选择全部列表处理，但是输入框不为空");
         return;
-      } else if (checkedSkip) return operateWholeList(passOrRefuse);
+      } else if (isAllListProcess) {
+        return operateWholeList(passOrRefuse);
+      }
 
       let idlist = getRows();
       const errorList = [];
@@ -314,7 +316,7 @@ try {
       containerDiv.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)";
       containerDiv.style.display = "grid";
       containerDiv.style.backgroundColor = "#efefef";
-      containerDiv.style.cursor = "move";
+      // containerDiv.style.cursor = "move";
       containerDiv.style.overflowWrap = "anywhere";
       containerDiv.style.left = "4px";
       containerDiv.style.top = "400px";
@@ -330,10 +332,19 @@ try {
       closeButton.style.background = "#ccc";
       closeButton.style.border = "none";
       closeButton.style.color = "#fff";
-      // closeButton.style.padding = "2px 5px";
-      closeButton.style.width = "15px";
+      closeButton.style.padding = "2px 5px";
+      closeButton.style.width = "20px"; // 增加宽度
+      closeButton.style.height = "20px"; // 增加高度
       closeButton.style.cursor = "pointer";
       closeButton.style.borderRadius = "50%"; // 使按钮呈圆形
+      closeButton.style.fontSize = "16px"; // 增加字体大小
+      closeButton.style.lineHeight = "16px"; // 设置行高使X居中
+      closeButton.style.display = "flex"; // 使用flex布局
+      closeButton.style.alignItems = "center"; // 垂直居中
+      closeButton.style.justifyContent = "center"; // 水平居中
+      closeButton.style.zIndex = "10000"; // 确保按钮在最上层
+      closeButton.style.opacity = "1"; // 确保按钮完全不透明
+      closeButton.style.visibility = "visible"; // 确保按钮可见
       closeButton.title = "关闭后需刷新页面重新打开"; // 添加title属性
 
       // 绑定点击事件以隐藏或删除containerDiv
@@ -353,7 +364,8 @@ try {
       // 添加多行文本输入
       const textarea = document.createElement("textarea");
       textarea.id = "batchInput";
-      textarea.placeholder = "请输入要处理的编号，每行一个";
+      textarea.placeholder =
+        "请输入要处理的地块标识，每行一个。如果输入的是地块编号，就得注意筛选到旗县。不然有编号重复";
       textarea.style.width = "320px";
       textarea.style.height = "100px";
       textarea.style.marginBottom = "10px";
@@ -378,20 +390,41 @@ try {
       //创建一个div容器
       var subContainer = document.createElement("div");
       subContainer.style.paddingBottom = "4px";
-
       containerDiv.appendChild(subContainer);
-      //创建一个复选框，可以选择是否跳过检测
-      var checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.id = "skipCheckbox";
-      checkbox.style.marginRight = "4px";
-      subContainer.appendChild(checkbox);
-      //复选框加一个label绑定
-      var checkboxLabel = document.createElement("label");
-      checkboxLabel.htmlFor = "skipCheckbox";
-      checkboxLabel.textContent =
-        "全部处理（勾选则忽略输入框。注意先筛选确认）";
-      subContainer.appendChild(checkboxLabel);
+
+      // 创建单选按钮组
+      const radioGroup = document.createElement("div");
+      radioGroup.style.marginBottom = "10px";
+
+      // 创建"输入处理"单选按钮
+      const inputRadio = document.createElement("input");
+      inputRadio.type = "radio";
+      inputRadio.id = "inputProcess";
+      inputRadio.name = "processType";
+      inputRadio.checked = true; // 默认选中
+
+      const inputLabel = document.createElement("label");
+      inputLabel.htmlFor = "inputProcess";
+      inputLabel.textContent = "处理输入框内";
+      inputLabel.style.marginRight = "15px";
+
+      // 创建"全部列表处理"单选按钮
+      const allListRadio = document.createElement("input");
+      allListRadio.type = "radio";
+      allListRadio.id = "allListProcess";
+      allListRadio.name = "processType";
+
+      const allListLabel = document.createElement("label");
+      allListLabel.htmlFor = "allListProcess";
+      allListLabel.textContent = "处理所有（注意先筛选）";
+
+      // 添加到radioGroup
+      radioGroup.appendChild(inputRadio);
+      radioGroup.appendChild(inputLabel);
+      // radioGroup.appendChild(allListRadio);
+      // radioGroup.appendChild(allListLabel);
+
+      subContainer.appendChild(radioGroup);
 
       // 创建开始执行按钮
       const startButton = document.createElement("button");

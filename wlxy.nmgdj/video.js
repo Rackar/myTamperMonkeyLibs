@@ -125,6 +125,9 @@
     let title = document.querySelector(
       '.simplebar-content div[class^="$id--player_side_title--"]'
     );
+    if (!title) {
+      return clearInterval(loopInterval);
+    }
     let text = title.innerText.replace("课程章节(", "").replace(")", "");
     let split = text.split("/");
     let current = split[0];
