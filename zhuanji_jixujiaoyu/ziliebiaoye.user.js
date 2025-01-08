@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         专业技术继续教育_子列表页2024
+// @name         专业技术继续教育_子列表页2025
 // @namespace    https://rackar.github.io/article_tech/zhuCeCHS_edu.html
 // @version      0.5
 // @description  try to take over the world!
@@ -31,7 +31,7 @@
 
   if (
     location.hash.indexOf("v_courseDetails") > -1 &&
-    new Date().getFullYear() === 2024
+    new Date().getFullYear() === 2025
   ) {
     setTimeout(async function () {
       // $(".course-h.oh ul li a").attr("target", "_blank");

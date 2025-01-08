@@ -11,7 +11,6 @@
 
 //注意事项：由于有跨域，必须安装access-control-allow-origin插件，并打开快捷方式目标命令 --disable-web-security --user-data-dir=E:\IDE。
 
-//全部，筛选开关打开县级是否一致，市级是否一致，省级林草部门是否认定，审核阶段：省级
 // 注意国土云有很多display:none;的元素，需要甄别后再获取操作。如获取到了非所需标签，指向打印结果时不会在页面上高亮
 try {
   (function () {
@@ -210,7 +209,7 @@ try {
       if (
         !(
           location.hash.indexOf("#/specialMission") > -1 &&
-          new Date().getFullYear() === 2024
+          new Date().getFullYear() === 2025
         )
       ) {
         return alert("需进入国土云2024卫片专项的全部地块列表");
@@ -240,10 +239,10 @@ try {
       if (
         !(
           location.hash.indexOf("#/specialMission") > -1 &&
-          new Date().getFullYear() === 2024
+          new Date().getFullYear() === 2025
         )
       ) {
-        return alert("需进入国土云林草审核专项");
+        return alert("需进入国土云2024卫片专项的全部地块列表");
       }
 
       // 获取文本框内容并处理成数组
@@ -413,16 +412,17 @@ try {
       allListRadio.type = "radio";
       allListRadio.id = "allListProcess";
       allListRadio.name = "processType";
+      allListRadio.disabled = true;
 
       const allListLabel = document.createElement("label");
       allListLabel.htmlFor = "allListProcess";
-      allListLabel.textContent = "处理所有（注意先筛选）";
+      allListLabel.textContent = "处理所有（注意先筛选，暂时禁用）";
 
       // 添加到radioGroup
       radioGroup.appendChild(inputRadio);
       radioGroup.appendChild(inputLabel);
-      // radioGroup.appendChild(allListRadio);
-      // radioGroup.appendChild(allListLabel);
+      radioGroup.appendChild(allListRadio);
+      radioGroup.appendChild(allListLabel);
 
       subContainer.appendChild(radioGroup);
 
