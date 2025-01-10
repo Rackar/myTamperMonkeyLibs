@@ -16,7 +16,7 @@ try {
   (function () {
     ("use strict");
     // const TEST_MODE = false; // 使用时将测试模式关闭
-    const TEST_MODE = false; // 调试时将测试模式打开
+    const TEST_MODE = true; // 调试时将测试模式打开
     let db;
 
     let code = "150000";
@@ -425,6 +425,14 @@ try {
       radioGroup.appendChild(allListLabel);
 
       subContainer.appendChild(radioGroup);
+      // 添加一个输入框用于输入审核意见
+      const auditInput = document.createElement("input");
+      auditInput.id = "auditInput";
+      auditInput.placeholder = "请输入审核意见";
+      auditInput.style.width = "320px";
+      auditInput.style.height = "40px";
+      auditInput.style.marginBottom = "10px";
+      containerDiv.appendChild(auditInput);
 
       // 创建开始执行按钮
       const startButton = document.createElement("button");
@@ -636,6 +644,28 @@ try {
           resolve();
         }, sec);
       });
+    }
+
+    async function copyAuditInput() {
+      try {
+        let auditInput = document.querySelector("#auditInput");
+        let text = auditInput.value;
+        let trs = doc.querySelectorAll("#pane-1 table.pdTable tr");
+        let textarea = trs[30].querySelector("textarea");
+        textarea.value = text;
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function getInfoFromPage() {
+      let iframe = document.querySelector("iframe");
+      let doc = iframe.contentDocument;
+      let trs = doc.querySelectorAll("#pane-1 table.pdTable tr");
+      let id = trs[2].children[1].innerText;
+      let bianjian = trs[8].querySelector("input").value;
+
+      return { id, bianjian };
     }
 
     async function clickIntoInfo(pass = true) {

@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         专业技术继续教育_视频页2025
+// @name         专业技术继续教育_视频页2025//已作废
 // @namespace    https://rackar.github.io/article_tech/zhuCeCHS_edu.html
 // @version      0.5
 // @description  try to take over the world!
 // @author       rackar
-// @match        https://web.chinahrt.com/index.html*
+// @match        https://gp.chinahrt.com/index.html*
 // @grant        none
 // ==/UserScript==
 
@@ -25,7 +25,7 @@
       setTimeout(function () {
         let btn = $("#newlinktoVideo");
         console.log(btn);
-        btn[0].click();
+        // btn[0].click();
       }, 500);
 
       // window.location.href = src;

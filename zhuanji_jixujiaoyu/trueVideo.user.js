@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         专业技术继续教育_真的视频页2025
+// @name         专业技术继续教育_真的视频页2025//已作废
 // @namespace    https://rackar.github.io/article_tech/zhuCeCHS_edu.html
 // @version      0.5
 // @description  try to take over the world!

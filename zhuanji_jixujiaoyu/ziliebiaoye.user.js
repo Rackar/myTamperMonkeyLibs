@@ -35,7 +35,7 @@
   ) {
     setTimeout(async function () {
       // $(".course-h.oh ul li a").attr("target", "_blank");
-
+      debugger;
       const arrNeed = checkJobDown();
 
       if (arrNeed.length) {
