@@ -15,16 +15,17 @@
 try {
   (function () {
     ("use strict");
-    // const TEST_MODE = false; // 使用时将测试模式关闭
-    const TEST_MODE = true; // 调试时将测试模式打开
+    const TEST_MODE = false; // 使用时将测试模式关闭
+    // const TEST_MODE = true; // 调试时将测试模式打开
     let db;
 
     let code = "150000";
     let arr = [];
 
     let running = false;
-    init();
     openDb();
+    init();
+
     /**
      * 打开或创建一个名为 myDatabase 的 IndexedDB 数据库
      * 该数据库版本为 1，如果数据库版本更新，会触发 onupgradeneeded 事件
@@ -44,46 +45,49 @@ try {
 
       // 监听数据库打开失败事件
       request.onerror = function (event) {
-        // 打印错误日志，包含错误代码
-        console.error(
-          "An error occurred while opening the database:",
-          event.target.errorCode
-        );
+        console.error("数据库打开失败:", event.target.errorCode);
       };
 
       // 监听数据库版本更新事件
       request.onupgradeneeded = function (event) {
         // 获取数据库对象
         db = event.target.result;
-        // 创建一个名为 person 的对象存储，主键为 id，自动递增
-        const objectStore = db.createObjectStore("record", {
-          keyPath: "id",
-          autoIncrement: true,
-        });
-        // 监听对象存储创建完成事件
-        objectStore.transaction.oncomplete = function (event) {
-          // 打印日志表示对象存储创建成功
-          console.log("Object store created successfully!2");
-        };
+
+        // 检查 object store 是否已存在
+        if (!db.objectStoreNames.contains("record")) {
+          // 创建一个名为 record 的对象存储，主键为 id，自动递增
+          const objectStore = db.createObjectStore("record", {
+            keyPath: "id",
+            autoIncrement: true,
+          });
+          console.log("Object store created successfully!");
+        }
       };
     }
 
     function addRow(bsm, tongguo = 1) {
-      // console.log("数据待写入", bsm);
-      const transaction = db.transaction(["record"], "readwrite");
-      // transaction.oncomplete = function (event) {
-      //   console.log("事务完成，但无法确定是否成功创建了对象存储。");
-      // };
-      // transaction.onerror = function (event) {
-      //   console.log("事务失败。");
-      // };
-      const request = transaction.objectStore("record").add({ bsm, tongguo });
-      request.onsuccess = function (event) {
-        console.log("数据写入成功", bsm);
-      };
-      request.onerror = function (event) {
-        console.log("数据写入失败", event);
-      };
+      // 确保数据库和 object store 存在
+      if (!db) {
+        console.error("数据库未初始化");
+        return;
+      }
+
+      try {
+        const transaction = db.transaction(["record"], "readwrite");
+        const store = transaction.objectStore("record");
+
+        const request = store.add({ bsm, tongguo });
+
+        request.onsuccess = function (event) {
+          console.log("数据写入成功", bsm);
+        };
+
+        request.onerror = function (event) {
+          console.error("数据写入失败", event);
+        };
+      } catch (error) {
+        console.error("添加记录时出错:", error);
+      }
     }
 
     // Your code here...
@@ -318,7 +322,7 @@ try {
       // containerDiv.style.cursor = "move";
       containerDiv.style.overflowWrap = "anywhere";
       containerDiv.style.left = "4px";
-      containerDiv.style.top = "400px";
+
       containerDiv.style.fontSize = "14px";
       document.body.appendChild(containerDiv);
 
@@ -488,7 +492,7 @@ try {
         element.style.position = "fixed";
         element.style.margin = "0";
         element.style.left = "4px";
-        element.style.top = "400px";
+        element.style.top = "500px";
         // 移除 transform，改用直接定位
         element.style.transform = "";
 
@@ -646,16 +650,32 @@ try {
       });
     }
 
-    async function copyAuditInput() {
+    async function copyAuditInput(pass = true) {
       try {
+        let iframe = document.querySelector("iframe");
+        let doc = iframe.contentDocument;
+
         let auditInput = document.querySelector("#auditInput");
-        let text = auditInput.value;
+        let text = auditInput.value || (pass ? "台账批量通过" : "台账批量退回");
         let trs = doc.querySelectorAll("#pane-1 table.pdTable tr");
-        let textarea = trs[30].querySelector("textarea");
+        console.log(trs);
+        let textarea = trs[trs.length - 2].querySelector("textarea");
         textarea.value = text;
+        textarea.dispatchEvent(new Event("input", { bubbles: true }));
       } catch (e) {
         console.error(e);
       }
+    }
+
+    async function retryAndWait(times, secends, cb) {
+      for (let i = 0; i < times; i++) {
+        if (await cb()) {
+          return true;
+        } else {
+          await sleepSec(secends * 1000);
+        }
+      }
+      return false;
     }
 
     function getInfoFromPage() {
@@ -671,23 +691,63 @@ try {
     async function clickIntoInfo(pass = true) {
       let iframe = document.querySelector("iframe");
       let doc = iframe.contentDocument;
-      let bu = doc.querySelector(
+      // let doc=document
+      let btns = doc.querySelectorAll(
         "#ListMain-list .list_table .el-table__fixed-right .el-table__row .cell button"
       );
-      bu.click();
+      // 仅有一个按钮，则点击，负责筛选有误
+      if (btns.length == 1) {
+        btns[0].click();
+      } else {
+        return false;
+      }
 
-      await sleepSec(2000);
+      let result1 = retryAndWait(8, 500, () => {
+        let tab1s = doc.querySelectorAll(".divbox2 #tab-1");
+        return tab1s.length > 0;
+      });
+      if (!result1) return false;
       let tab1s = doc.querySelectorAll(".divbox2 #tab-1");
       let tab1 = tab1s[tab1s.length - 1];
       tab1.click();
-      await sleepSec(500);
-      let radios = doc.querySelectorAll(".pdTable .radiocontent input");
+
+      await sleepSec(600);
+      let radiosAll = doc.querySelectorAll(".pdTable .radiocontent input");
+      console.log(radiosAll);
+      let radios = [];
+      for (let i = 0; i < radiosAll.length; i++) {
+        const radio = radiosAll[i];
+        if (
+          radio.parentNode.parentNode
+            .querySelector(".el-radio__label")
+            .innerText.trim() == "通过" ||
+          radio.parentNode.parentNode
+            .querySelector(".el-radio__label")
+            .innerText.trim() == "不通过"
+        ) {
+          radios.push(radio.parentNode.parentNode);
+        }
+      }
+      if (radios.length != 2) return false;
 
       // 如果通过
       if (pass) {
+        await sleepSec(250);
+        radios[0].focus();
+        await sleepSec(50);
         radios[0].click();
-        await sleepSec(200);
 
+        // 等待短暂时间让DOM更新
+        await sleepSec(50);
+
+        // 确保radio被选中
+        radios[0]
+          .querySelector("input")
+          .dispatchEvent(new Event("change", { bubbles: true }));
+        // 等待短暂时间让DOM更新
+        await sleepSec(50);
+        copyAuditInput(pass);
+        await sleepSec(200);
         let btns = doc.querySelectorAll(".pdTable button");
         if (!TEST_MODE) {
           btns[0].click();
@@ -698,7 +758,22 @@ try {
           submit.click();
         }
       } else {
+        await sleepSec(250);
+        radios[1].focus();
+        await sleepSec(50);
         radios[1].click();
+
+        // 等待短暂时间让DOM更新
+        await sleepSec(50);
+
+        // 确保radio被选中
+        radios[1]
+          .querySelector("input")
+          .dispatchEvent(new Event("change", { bubbles: true }));
+        // 等待短暂时间让DOM更新
+        await sleepSec(50);
+        copyAuditInput(pass);
+
         await sleepSec(200);
         let btns = doc.querySelectorAll(".pdTable button");
         if (!TEST_MODE) {
@@ -730,5 +805,6 @@ try {
     }
   })();
 } catch (e) {
-  alert("脚本出现报错，群里通知下");
+  console.error(e);
+  alert("脚本出现报错，群里通知下。错误:", e);
 }
