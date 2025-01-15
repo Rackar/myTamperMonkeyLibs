@@ -19,13 +19,23 @@
     });
   }
   async function doAllClassListen(obj) {
+    // //逐课点击
+    // for (let i = 0; i < obj.length; i++) {
+    //   obj[i].button.click();
+    //   console.log("点击按钮第" + i + ", 预计等待时长为:" + obj[i].time);
+    //   await sleepTime(obj[i].time);
+    // }
+
+    // 所有课程点击
+    let allTime = 0;
     for (let i = 0; i < obj.length; i++) {
-      obj[i].button.click();
-      console.log("点击按钮第" + i + ", 预计等待时长为:" + obj[i].time);
-      await sleepTime(obj[i].time);
+      allTime += obj[i].time;
     }
-    await sleepTime(5);
+    obj[0].button.click();
+    await sleepTime(allTime);
+
     //原地刷新更新进度
+    await sleepTime(5);
     location.reload();
   }
 
