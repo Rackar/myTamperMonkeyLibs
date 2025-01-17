@@ -37,9 +37,7 @@ try {
 
       // 监听数据库打开成功事件
       request.onsuccess = function (event) {
-        // 获取数据库对象
         db = event.target.result;
-        // 打印日志表示数据库打开成功
         console.log("数据库打开成功");
       };
 
@@ -50,13 +48,11 @@ try {
 
       // 监听数据库版本更新事件
       request.onupgradeneeded = function (event) {
-        // 获取数据库对象
         db = event.target.result;
 
-        // 检查 object store 是否已存在
+        // 检查 object store 是否已存在，如果不存在则创建
         if (!db.objectStoreNames.contains("record")) {
-          // 创建一个名为 record 的对象存储，主键为 id，自动递增
-          const objectStore = db.createObjectStore("record", {
+          db.createObjectStore("record", {
             keyPath: "id",
             autoIncrement: true,
           });
@@ -66,28 +62,47 @@ try {
     }
 
     function addRow(bsm, tongguo = 1) {
-      // 确保数据库和 object store 存在
-      if (!db) {
-        console.error("数据库未初始化");
-        return;
-      }
+      return new Promise((resolve, reject) => {
+        // 确保数据库已初始化
+        if (!db) {
+          console.error("数据库未初始化");
+          reject(new Error("数据库未初始化"));
+          return;
+        }
 
-      try {
-        const transaction = db.transaction(["record"], "readwrite");
-        const store = transaction.objectStore("record");
+        try {
+          // 检查 object store 是否存在
+          if (!db.objectStoreNames.contains("record")) {
+            console.error("找不到 record store，尝试重新初始化数据库");
+            // 关闭当前数据库连接
+            db.close();
+            // 删除旧数据库
+            indexedDB.deleteDatabase("myDatabase");
+            // 重新打开数据库
+            openDb();
+            reject(new Error("数据库需要重新初始化，请重试"));
+            return;
+          }
 
-        const request = store.add({ bsm, tongguo });
+          const transaction = db.transaction(["record"], "readwrite");
+          const store = transaction.objectStore("record");
 
-        request.onsuccess = function (event) {
-          console.log("数据写入成功", bsm);
-        };
+          const request = store.add({ bsm, tongguo });
 
-        request.onerror = function (event) {
-          console.error("数据写入失败", event);
-        };
-      } catch (error) {
-        console.error("添加记录时出错:", error);
-      }
+          request.onsuccess = function (event) {
+            console.log("数据写入成功", bsm);
+            resolve();
+          };
+
+          request.onerror = function (event) {
+            console.error("数据写入失败", event);
+            reject(event);
+          };
+        } catch (error) {
+          console.error("添加记录时出错:", error);
+          reject(error);
+        }
+      });
     }
 
     // Your code here...
@@ -672,6 +687,7 @@ try {
         if (await cb()) {
           return true;
         } else {
+          console.log(cb.name + "自动重试中:" + i);
           await sleepSec(secends * 1000);
         }
       }
@@ -751,12 +767,20 @@ try {
         let btns = doc.querySelectorAll(".pdTable button");
         if (!TEST_MODE) {
           btns[0].click();
-          await sleepSec(300);
-          let submit = doc.querySelector(
-            'button.el-button.el-button--default.el-button--small.el-button--primary[type="button"] > span:nth-child(1)'
-          );
-          submit.click();
         }
+        // let submit = doc.querySelector(
+        //   'button.el-button.el-button--default.el-button--small.el-button--primary[type="button"] > span:nth-child(1)'
+        // );
+        // let result2 = retryAndWait(10, 100, () => {
+        //   submit = doc.querySelector(
+        //     'button.el-button.el-button--default.el-button--small.el-button--primary[type="button"] > span:nth-child(1)'
+        //   );
+        //   return submit;
+        // });
+        // if (!result2) return false;
+        // if (!TEST_MODE) {
+        //   submit.click();
+        // }
       } else {
         await sleepSec(250);
         radios[1].focus();
@@ -776,12 +800,19 @@ try {
 
         await sleepSec(200);
         let btns = doc.querySelectorAll(".pdTable button");
-        if (!TEST_MODE) {
-          btns[1].click();
-          await sleepSec(300);
-          let submit = doc.querySelector(
+        btns[1].click();
+        let submit = doc.querySelector(
+          'button.el-button.el-button--default.el-button--small.el-button--primary[type="button"] > span:nth-child(1)'
+        );
+        let result2 = retryAndWait(10, 100, () => {
+          submit = doc.querySelector(
             'button.el-button.el-button--default.el-button--small.el-button--primary[type="button"] > span:nth-child(1)'
           );
+          console.log("查找确定按钮重试中");
+          return submit;
+        });
+        if (!result2) return false;
+        if (!TEST_MODE) {
           submit.click();
         }
       }
@@ -798,7 +829,12 @@ try {
       }
       if (index != -1) {
         id = ids[index + 1].innerText;
-        addRow(index, pass ? 1 : 0);
+        try {
+          await addRow(id, pass ? 1 : 0);
+        } catch (error) {
+          console.error("添加记录失败:", error);
+          // 可以选择重试或者继续其他操作
+        }
       }
 
       return true;
