@@ -66,8 +66,8 @@
   </div>
   <style>
     /* #app div:first-child {
-      inset: auto !important;
-    } */
+        inset: auto !important;
+      } */
 
     #dialog {
       width: 350px;
@@ -96,8 +96,8 @@
     }
   </style>
   <script>
-    const { createApp } = Vue
-    const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t正式地址 pm2启用
+    const { createApp } = Vue;
+    const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t api正式地址 pm2启用
     const API_ADDRESS = HOST + "nmgty"; //
     const DICT_ADDRESS = HOST + "nmgty/dict";
     function getDetail() {
@@ -106,7 +106,10 @@
       let result = {};
       for (let i = 0; i < list.length; i++) {
         const row = list[i];
-        let name = row.querySelector("label").innerText.trim().replace("：", "");
+        let name = row
+          .querySelector("label")
+          .innerText.trim()
+          .replace("：", "");
 
         let value = row.querySelector("input").value.trim();
         if (name == "月份") result.month = value;
@@ -180,7 +183,7 @@
           })
           .catch((error) => {
             console.error("错误:", error);
-            alert("后台响应报错")
+            alert("后台响应报错");
             resolve(false);
           });
       });
@@ -197,7 +200,7 @@
       data() {
         return {
           showMsg: true,
-          message: 'Hello Vue!',
+          message: "Hello Vue!",
           activeTab: "图斑类型",
           dictOptions: [],
           typeChecked: [],
@@ -205,30 +208,29 @@
           refuseChecked: [],
           textarea: "",
           textarea2: "",
-
-        }
+        };
       },
       computed: {
         // 一个计算属性的 getter
         typeOptions() {
-          return this.dictOptions.filter((el) => el.type == "图斑类型") || []
+          return this.dictOptions.filter((el) => el.type == "图斑类型") || [];
         },
         passOptions() {
-          return this.dictOptions.filter((el) => el.type == "通过") || []
+          return this.dictOptions.filter((el) => el.type == "通过") || [];
         },
         refuseOptions() {
-          return this.dictOptions.filter((el) => el.type == "不通过") || []
-        }
+          return this.dictOptions.filter((el) => el.type == "不通过") || [];
+        },
       },
       async mounted() {
-        console.log("mounted")
+        console.log("mounted");
         const data = await fetch(DICT_ADDRESS, {
           method: "GET",
           headers: {
             "Content-Type": "application/json;charset=utf-8",
           },
         }).then((response) => response.json());
-        this.dictOptions = data.data || []
+        this.dictOptions = data.data || [];
       },
       methods: {
         resetAll() {
@@ -236,8 +238,7 @@
           this.passChecked = [];
           this.refuseChecked = [];
           this.textarea = "";
-          this.textarea2 = ""
-
+          this.textarea2 = "";
         },
         dai_tong_guo() {
           this.activeTab = "通过";
@@ -258,12 +259,11 @@
           }
 
           let data = await getDetail();
-          data.sh_lx = this.typeChecked.join(';') || ""
+          data.sh_lx = this.typeChecked.join(";") || "";
 
           await jumpToPassTab();
 
           let radioPass = this.passChecked.join("; ") + "; " + this.textarea;
-
 
           let passpanel = document.querySelector("#pane-check");
           let inputRadio = passpanel.querySelectorAll("input[type=radio]");
@@ -283,11 +283,17 @@
             ".el-message-box .el-message-box__btns button"
           );
           sbtn[1].click(); //确定键，调试时按取消[0]
-          let postok = await postRefuseReason("通过", this.typeChecked.join("; ") + radioPass, data);
+          let postok = await postRefuseReason(
+            "通过",
+            this.typeChecked.join("; ") + radioPass,
+            data
+          );
           this.resetAll();
-          resetSubmitArea(textbox)
+          resetSubmitArea(textbox);
           if (!postok) {
-            this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
+            this.$message.error(
+              "出现问题，提交保存失败。请记录图斑号和通过理由在群里上报"
+            );
           }
         },
         async bu_tong_guo() {
@@ -303,12 +309,11 @@
           }
 
           let data = await getDetail();
-          data.sh_lx = this.typeChecked.join(';') || ""
+          data.sh_lx = this.typeChecked.join(";") || "";
 
           await jumpToPassTab();
 
           let radioPass = this.refuseChecked.join("; ") + "; " + this.textarea2;
-
 
           let passpanel = document.querySelector("#pane-check");
           let inputRadio = passpanel.querySelectorAll("input[type=radio]");
@@ -327,15 +332,23 @@
             ".el-message-box .el-message-box__btns button"
           );
           sbtn[1].click(); //确定键，调试时按取消[0]
-          let postok = await postRefuseReason("不通过", this.typeChecked.join("; ") + radioPass, data);
+          let postok = await postRefuseReason(
+            "不通过",
+            this.typeChecked.join("; ") + radioPass,
+            data
+          );
           this.resetAll();
-          resetSubmitArea(textbox)
+          resetSubmitArea(textbox);
           if (!postok) {
-            this.$message.error("出现问题，提交保存失败。请记录图斑号和通过理由在群里上报");
+            this.$message.error(
+              "出现问题，提交保存失败。请记录图斑号和通过理由在群里上报"
+            );
           }
-        }
-      }
-    }).use(ElementPlus).mount('#app')
+        },
+      },
+    })
+      .use(ElementPlus)
+      .mount("#app");
   </script>
 </body>
 

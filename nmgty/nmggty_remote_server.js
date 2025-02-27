@@ -112,7 +112,7 @@ try {
     document.body.append(el);
 
     const { createApp } = Vue;
-    const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t正式地址 pm2启用
+    const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t api正式地址 pm2启用
     const API_ADDRESS = HOST + "nmgty"; //
     const DICT_ADDRESS = HOST + "nmgty/dict";
     function getDetail() {
