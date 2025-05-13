@@ -100,7 +100,7 @@
     const HOST = "https://nmgwxyy.cn/alatan/yangxut/noauth/"; // t api正式地址 pm2启用
     const API_ADDRESS = HOST + "nmgty"; //
     const DICT_ADDRESS = HOST + "nmgty/dict";
-    function getDetail() {
+    function getNmgGtyDetail() {
       let d = document.querySelector("#pane-图斑信息");
       let list = d.querySelectorAll("div.el-col");
       let result = {};
@@ -246,19 +246,29 @@
         dai_bu_tong_guo() {
           this.activeTab = "不通过";
         },
-        async tong_guo() {
+        // 判断是否满足提交条件的函数
+        isConditionIsOK() {
           if (this.passChecked.length == 0) {
-            return this.$message.error("未选择通过类型");
+            this.$message.error("未选择通过/不通过类型");
+            return false
           }
           if (this.typeChecked.length == 0) {
-            return this.$message.error("未选择图斑类型");
+            this.$message.error("未选择图斑类型");
+            return false
           }
           let url = window.location.href;
           if (!url.includes("spotListDetail")) {
-            return this.$message.error("请先进入详情页面查看举证情况");
+            this.$message.error("请先进入详情页面查看举证情况");
+            return false
+          }
+          return true
+        },
+        async tong_guo() {
+          if (!this.isConditionIsOK()) {
+            return
           }
 
-          let data = await getDetail();
+          let data = await getNmgGtyDetail();
           data.sh_lx = this.typeChecked.join(";") || "";
 
           await jumpToPassTab();
@@ -297,18 +307,11 @@
           }
         },
         async bu_tong_guo() {
-          if (this.refuseChecked.length == 0) {
-            return this.$message.error("未选择不通过类型");
-          }
-          if (this.typeChecked.length == 0) {
-            return this.$message.error("未选择图斑类型");
-          }
-          let url = window.location.href;
-          if (!url.includes("spotListDetail")) {
-            return this.$message.error("请先进入详情页面查看举证情况");
+          if (!this.isConditionIsOK()) {
+            return
           }
 
-          let data = await getDetail();
+          let data = await getNmgGtyDetail();
           data.sh_lx = this.typeChecked.join(";") || "";
 
           await jumpToPassTab();

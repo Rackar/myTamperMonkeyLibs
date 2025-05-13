@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         内蒙古干部网络学院视频页
+// @name         内蒙古干部网络学院真的视频页
 // @namespace    https://rackar.github.io/article_tech/zhuCeCHS_edu.html
 // @version      0.4
 // @description  try to take over the world!
@@ -49,8 +49,8 @@
       sleepSec(1);
     }
 
-    if (v.playbackRate != 1.5) {
-      v.playbackRate = 1.5;
+    if (video && video.playbackRate != 1.5) {
+      video.playbackRate = 1.5;
     }
   }
 
@@ -70,8 +70,11 @@
     //   window.open("", "_self");
     //   window.close();
     // }
-    let index = parseInt(localStorage.getItem("list-start-index")) || 0;
-    localStorage.setItem("list-start-index", index + 1);
+    let tag = `${new Date().getFullYear()}${
+      new Date().getMonth() + 1
+    }-list-start-index`;
+    let index = parseInt(localStorage.getItem(tag)) || 0;
+    localStorage.setItem(tag, index + 1);
     localStorage.setItem("retry-times", 0);
     loopInterval = null;
     window.history.back();
